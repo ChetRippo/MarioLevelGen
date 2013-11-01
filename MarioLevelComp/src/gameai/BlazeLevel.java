@@ -11,14 +11,15 @@ import java.util.Random;
 
 /**
  * Created with IntelliJ IDEA.
- * User: Butt
+ * User: weed
  * Date: 10/30/13
  * Time: 5:12 PM
  * To change this template use File | Settings | File Templates.
  */
 
-//butt comment
 public class BlazeLevel extends Level implements LevelInterface {
+    static final int chunkWidth = 8;
+    static final int floorHeight = (int)Math.floor(Math.random()*14)+3;
 
     public BlazeLevel(int width, int height, long seed, int difficulty,
                       int type) {
@@ -26,42 +27,87 @@ public class BlazeLevel extends Level implements LevelInterface {
         create(seed, difficulty, type);
     }
 
-    public void create(long seed, int difficulty, int type) {
-        for(int x = 0; x < width; x++){
-            setBlock(x, 2, ROCK);
+    private void create(long seed, int difficulty, int type) {
+        int numberChunks = (int)Math.floor(Math.random()*6)+10;
+
+        buildStartChunk();
+
+        int i = 1;
+        for(; i < numberChunks; i++){
+            buildChunk(i*chunkWidth);
         }
-        xExit = width-8;
+        buildFinalChunk(i*chunkWidth);
+
+        decorate(0, numberChunks*chunkWidth, floorHeight);
     }
 
-    /*private int buildZone(int x, int maxLength) {
+    private void buildChunk(int startX) {
+        int x = startX;
+        for(int i = 0; i < chunkWidth; i++){
+            setBlock(x+i, 2, ROCK);
+        }
+        xExit = x;
     }
 
-    private int buildJump(int xo, int maxLength) {
-
+    private void buildStartChunk(){
+        for(int i = 0; i < chunkWidth; i++){
+            setBlock(i, floorHeight, ROCK);
+        }
     }
 
-    private int buildHillStraight(int xo, int maxLength) {
-
-    }
-
-    private void addEnemyLine(int x0, int x1, int y) {
-    }
-
-    private int buildTubes(int xo, int maxLength) {
-    }
-
-    private int buildStraight(int xo, int maxLength, boolean safe) {
-
+    private void buildFinalChunk(int startX){
+        xExit = startX+4;
+        for(int i = 0; i < chunkWidth; i++){
+            setBlock(startX+i, floorHeight, ROCK);
+        }
     }
 
     private void decorate(int xStart, int xLength, int floor) {
-    }
+        //if its at the very top, just return
+        if (floor < 1)
+            return;
+        boolean rocks = true;
 
-    private void fixWalls() {
-    }
+        //add an enemy line above the box
 
-    private void blockify(Level level, boolean[][] blocks, int width,
-                          int height) {
-    } */
+        int s = (int)Math.floor(Math.random()*4)+1;
+        int e = (int)Math.floor(Math.random()*4)+1;
+
+        if (floor - 2 > 0) {
+            if ((xLength - 1 - e) - (xStart + 1 + s) > 1) {
+                for (int x = xStart + 1 + s; x < xLength - 1 - e; x++) {
+                    setBlock(x, floor - 2, (byte) (2 + 2 * 16));
+                }
+            }
+        }
+
+        s = (int)Math.floor(Math.random()*4)+1;
+        e = (int)Math.floor(Math.random()*4)+1;
+
+        if (floor - 4 > 0) {
+            if ((xLength - 1 - e) - (xStart + 1 + s) > 2) {
+                for (int x = xStart + 1 + s; x < xLength - 1 - e; x++) {
+                    if (rocks) {
+                        if (x != xStart + 1 && x != xLength - 2 &&
+                                Math.floor(Math.random()*2) == 0) {
+                            if (Math.floor(Math.random()*2) == 0) {
+                                setBlock(x, floor - 4, BLOCK_POWERUP);
+                            } else {
+                                setBlock(x, floor - 4, BLOCK_EMPTY);
+                            }
+                        } else if (Math.floor(Math.random()*4) == 0) {
+                            if (Math.floor(Math.random()*4) == 0) {
+                                setBlock(x, floor - 4, (byte) (2 + 1 * 16));
+                            } else {
+                                setBlock(x, floor - 4, (byte) (1 + 1 * 16));
+                            }
+                        } else {
+                            setBlock(x, floor - 4, BLOCK_EMPTY);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
 }
