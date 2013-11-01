@@ -41,7 +41,7 @@ public class BlazeLevel extends Level implements LevelInterface {
     }
 
     private void buildChunk(ChunkBuilder c, int startX) {
-        c.buildChunks(startX, 12, chunkWidth, chunkWidth, HILL_TOP);
+        c.buildChunks(startX, 7, chunkWidth, chunkWidth, HILL_TOP);
 
         int isLastChunk = (int)Math.floor(Math.random()*startX);
         boolean last = (isLastChunk > 60);
@@ -53,12 +53,12 @@ public class BlazeLevel extends Level implements LevelInterface {
     }
 
     private void buildStartChunk(ChunkBuilder c){
-        c.buildChunks(0, 12, chunkWidth, chunkWidth, HILL_TOP);
+        c.buildChunks(0, 7, chunkWidth, chunkWidth, HILL_TOP);
     }
 
     private void buildFinalChunk(ChunkBuilder c, int startX){
         xExit = startX+4;
-        c.buildChunks(startX, 12, chunkWidth, chunkWidth, HILL_TOP);
+        c.buildChunks(startX, 7, chunkWidth, chunkWidth, HILL_TOP);
     }
 
     private void decorate(int xStart, int xLength, int floor) {
