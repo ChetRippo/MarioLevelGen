@@ -17,6 +17,9 @@ import java.util.Random;
  * To change this template use File | Settings | File Templates.
  */
 
+// SCF
+//C -> CC || CF
+
 public class BlazeLevel extends Level implements LevelInterface {
     static final int chunkWidth = 8;
     static final int floorHeight = (int)Math.floor(Math.random()*14)+3;
@@ -30,29 +33,35 @@ public class BlazeLevel extends Level implements LevelInterface {
     private void create(long seed, int difficulty, int type) {
         int numberChunks = (int)Math.floor(Math.random()*6)+10;
 
-        buildStartChunk();
+        ChunkBuilder c = new ChunkBuilder(this);
 
-        int i = 1;
-        for(; i < numberChunks; i++){
-            buildChunk(i*chunkWidth);
-        }
-        buildFinalChunk(i*chunkWidth);
+        buildStartChunk(c);
 
-        decorate(0, numberChunks*chunkWidth, floorHeight);
+        //buildChunk(c);
+
     }
 
     private void buildChunk(int startX) {
         int x = startX;
-        for(int i = 0; i < chunkWidth; i++){
-            setBlock(x+i, 2, ROCK);
-        }
-        xExit = x;
+
+
+        //for(int i = 0; i < chunkWidth; i++){
+        //    setBlock(x+i, 2, ROCK);
+        //}
+        //xExit = x;
+        //yExit = floorHeight;
+
+        //decorate(startX, startX+chunkWidth, floorHeight);
+
+        //int isLastChunk = (int)Math.floor(Math.random()*startX);
     }
 
-    private void buildStartChunk(){
-        for(int i = 0; i < chunkWidth; i++){
-            setBlock(i, floorHeight, ROCK);
-        }
+    private void buildStartChunk(ChunkBuilder c){
+        //for(int i = 0; i < chunkWidth; i++){
+          //  setBlock(i, floorHeight, ROCK);
+        //}
+
+        c.buildChunks(0, 12, chunkWidth, chunkWidth, HILL_TOP);
     }
 
     private void buildFinalChunk(int startX){
@@ -67,8 +76,6 @@ public class BlazeLevel extends Level implements LevelInterface {
         if (floor < 1)
             return;
         boolean rocks = true;
-
-        //add an enemy line above the box
 
         int s = (int)Math.floor(Math.random()*4)+1;
         int e = (int)Math.floor(Math.random()*4)+1;

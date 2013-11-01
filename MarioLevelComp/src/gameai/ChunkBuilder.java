@@ -28,7 +28,7 @@ public class ChunkBuilder {
         this.lvl = lvl;
     }
 
-    public void buildChunks(int width, int height, byte block) {
+    public void buildChunks(int startX, int startY, int width, int height, byte block) {
         if (width <=0) {throw new IllegalArgumentException("buildChunks Exception : Need positive width");}
         if (height <=0) {throw new IllegalArgumentException("buildChunks Exception : Need positive height");}
 
@@ -43,7 +43,7 @@ public class ChunkBuilder {
             for(int y=0; y < height; y++) {
                 //When was the last block placed? What are our chances to dropping a block?
                 //Is there a ledge (block->gap or gap->ledge) above us?
-                lvl.setBlock(x, y, block);
+                lvl.setBlock(x+startX, y+startY, block);
             }
         }
     }
