@@ -22,7 +22,6 @@ import java.util.Random;
 
 public class BlazeLevel extends Level implements LevelInterface {
     static final int chunkWidth = 8;
-    static final int floorHeight = (int)Math.floor(Math.random()*14)+3;
 
     public BlazeLevel(int width, int height, long seed, int difficulty,
                       int type) {
@@ -37,38 +36,29 @@ public class BlazeLevel extends Level implements LevelInterface {
 
         buildStartChunk(c);
 
-        //buildChunk(c);
+        buildChunk(c, chunkWidth);
 
     }
 
-    private void buildChunk(int startX) {
-        int x = startX;
+    private void buildChunk(ChunkBuilder c, int startX) {
+        c.buildChunks(startX, 12, chunkWidth, chunkWidth, HILL_TOP);
 
-
-        //for(int i = 0; i < chunkWidth; i++){
-        //    setBlock(x+i, 2, ROCK);
-        //}
-        //xExit = x;
-        //yExit = floorHeight;
-
-        //decorate(startX, startX+chunkWidth, floorHeight);
-
-        //int isLastChunk = (int)Math.floor(Math.random()*startX);
+        int isLastChunk = (int)Math.floor(Math.random()*startX);
+        boolean last = (isLastChunk > 60);
+        if(last){
+            buildFinalChunk(c, startX + chunkWidth);
+        }else{
+            buildChunk(c, startX+chunkWidth);
+        }
     }
 
     private void buildStartChunk(ChunkBuilder c){
-        //for(int i = 0; i < chunkWidth; i++){
-          //  setBlock(i, floorHeight, ROCK);
-        //}
-
         c.buildChunks(0, 12, chunkWidth, chunkWidth, HILL_TOP);
     }
 
-    private void buildFinalChunk(int startX){
+    private void buildFinalChunk(ChunkBuilder c, int startX){
         xExit = startX+4;
-        for(int i = 0; i < chunkWidth; i++){
-            setBlock(startX+i, floorHeight, ROCK);
-        }
+        c.buildChunks(startX, 12, chunkWidth, chunkWidth, HILL_TOP);
     }
 
     private void decorate(int xStart, int xLength, int floor) {
