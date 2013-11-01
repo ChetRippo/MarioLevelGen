@@ -16,6 +16,8 @@ import java.util.Random;
  * Time: 5:12 PM
  * To change this template use File | Settings | File Templates.
  */
+
+//butt comment
 public class BlazeLevel extends Level implements LevelInterface {
 
     public BlazeLevel(int width, int height, long seed, int difficulty,
