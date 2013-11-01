@@ -22,10 +22,12 @@ public class ChunkBuilder {
 
     //members
     int jumpHeight = 3; //This is used to determine the max height blocks can be spaced vertically
+    double block_density;
     Level lvl;
 
-    public ChunkBuilder(Level lvl) {
+    public ChunkBuilder(Level lvl, double block_density) {
         this.lvl = lvl;
+        this.block_density = block_density;
     }
 
     public void buildChunks(int startX, int startY, int width, int height, byte block) {
@@ -38,14 +40,36 @@ public class ChunkBuilder {
         //Build a 2D array of width by height
         int[][] chunk = new int[width][height];
 
+        sketchChunk(chunk, width, height); //populates array with 0's and 1's for blocks
+        setChunk(chunk, width, height, startX, startY, block);
+    }
+
+    public void sketchChunk(int[][] chunk, int width, int height) {
+
         //Traverse each row of the array:
         for(int x=0; x < width; x++) {
             for(int y=0; y < height; y++) {
                 //When was the last block placed? What are our chances to dropping a block?
+                double block_chance = calculateBlockChance();
                 //Is there a ledge (block->gap or gap->ledge) above us?
-                lvl.setBlock(x+startX, y+startY, block);
+                //boolean beneath_ledge = underLedgeCheck();
+                double picker = Math.random();
+                if(picker < block_density) {chunk[x][y] = 1;}
             }
         }
+    }
+
+    public void setChunk(int[][] chunk, int width, int height, int startX, int startY, byte block) {
+        //Traverse each row of the array:
+        for(int x=0; x < width; x++) {
+            for(int y=0; y < height; y++) {
+                if(chunk[x][y] == 1) {lvl.setBlock(x+startX, y+startY, block);}
+            }
+        }
+    }
+
+    public double calculateBlockChance() {
+        return 0.0;
     }
 
 }
