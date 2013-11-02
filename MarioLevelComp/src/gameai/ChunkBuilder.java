@@ -23,38 +23,50 @@ public class ChunkBuilder {
     //members
     int jumpHeight = 3; //This is used to determine the max height blocks can be spaced vertically
     double block_density;
+    int platform_size;
     Level lvl;
 
-    public ChunkBuilder(Level lvl, double block_density) {
+    public ChunkBuilder(Level lvl, double block_density, int platform_size) {
         this.lvl = lvl;
         this.block_density = block_density;
+        this.platform_size =  platform_size; //what is the "average" platform size
     }
 
     public void buildChunks(int startX, int startY, int width, int height, byte block) {
         if (width <=0) {throw new IllegalArgumentException("buildChunks Exception : Need positive width");}
         if (height <=0) {throw new IllegalArgumentException("buildChunks Exception : Need positive height");}
 
-        //What is the middle, for placing start and end platforms
-        int center_block = height / 2;
-
         //Build a 2D array of width by height
         int[][] chunk = new int[width][height];
 
         sketchChunk(chunk, width, height); //populates array with 0's and 1's for blocks
-        setChunk(chunk, width, height, startX, startY, block);
+        setChunk(chunk, width, height, startX, startY, block); //set the actual tiles for the chunk
     }
 
     public void sketchChunk(int[][] chunk, int width, int height) {
+        //What is the middle, for placing start and end platforms
+        int center_block = height / 2;
+        double block_chance = 1.0; //how likely are we to place a block
+        int continuous_blocks = 0; //Did we just place a block
+        int start_center = 0;
+        int end_center = 0;
 
+        chunk[0][center_block] = 1;
+        chunk[width - 1][center_block] = 1;
         //Traverse each row of the array:
-        for(int x=0; x < width; x++) {
-            for(int y=0; y < height; y++) {
+        for(int y=0; y < height; y++) {
+            for(int x=0; x < width; x++) {
                 //When was the last block placed? What are our chances to dropping a block?
-                double block_chance = calculateBlockChance();
+                block_chance = calculateBlockChance(continuous_blocks);
                 //Is there a ledge (block->gap or gap->ledge) above us?
                 //boolean beneath_ledge = underLedgeCheck();
-                double picker = Math.random();
-                if(picker < block_density) {chunk[x][y] = 1;}
+                double block_picker = Math.random();
+                //If we are going to place a block
+                if(block_picker < block_chance) {
+                    chunk[x][y] = 1;
+                    continuous_blocks++;
+                }
+                else {continuous_blocks = 0;}
             }
         }
     }
@@ -68,8 +80,16 @@ public class ChunkBuilder {
         }
     }
 
-    public double calculateBlockChance() {
-        return 0.0;
+    public double calculateBlockChance(int continuous_blocks) {
+        double block_chance = 0.0;
+
+        if (continuous_blocks < platform_size) {
+            block_chance = block_density + (continuous_blocks * 0.2);// - calculateBlockChance();
+        }
+        else {
+            block_chance = block_density - (continuous_blocks * 0.2);// - calculateBlockChance();
+        }
+        return block_chance;
     }
 
 }

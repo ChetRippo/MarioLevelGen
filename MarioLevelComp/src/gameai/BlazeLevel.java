@@ -33,7 +33,7 @@ public class BlazeLevel extends Level implements LevelInterface {
     private void create(long seed, int difficulty, int type) {
 
         double block_density = 0.7; //Between 0 - 1
-        ChunkBuilder c = new ChunkBuilder(this, block_density);
+        ChunkBuilder c = new ChunkBuilder(this, block_density, 1);
 
         buildStartChunk(c);
 
