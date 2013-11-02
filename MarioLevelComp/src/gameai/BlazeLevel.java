@@ -32,7 +32,7 @@ public class BlazeLevel extends Level implements LevelInterface {
 
     private void create(long seed, int difficulty, int type) {
 
-        double block_density = 0.4; //Between 0 - 1
+        double block_density = 0.7; //Between 0 - 1
         ChunkBuilder c = new ChunkBuilder(this, block_density);
 
         buildStartChunk(c);
@@ -42,7 +42,9 @@ public class BlazeLevel extends Level implements LevelInterface {
     }
 
     private void buildChunk(ChunkBuilder c, int startX) {
-        c.buildChunks(startX, 7, chunkWidth, chunkWidth, HILL_TOP);
+        c.buildChunks(startX, floor-3-(int)Math.floor(Math.random()*4), chunkWidth, chunkWidth, HILL_TOP);
+
+        c.block_density = Math.random()*1;
 
         int isLastChunk = (int)Math.floor(Math.random()*startX);
         boolean last = (isLastChunk > 60);
