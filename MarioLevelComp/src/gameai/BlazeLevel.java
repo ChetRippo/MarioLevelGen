@@ -22,6 +22,7 @@ import java.util.Random;
 
 public class BlazeLevel extends Level implements LevelInterface {
     static final int chunkWidth = 8;
+    static final int floor = (int)Math.floor(Math.random()*10) + 7;
 
     public BlazeLevel(int width, int height, long seed, int difficulty,
                       int type) {
@@ -30,7 +31,6 @@ public class BlazeLevel extends Level implements LevelInterface {
     }
 
     private void create(long seed, int difficulty, int type) {
-        int numberChunks = (int)Math.floor(Math.random()*6)+10;
 
         double block_density = 0.4; //Between 0 - 1
         ChunkBuilder c = new ChunkBuilder(this, block_density);
@@ -54,12 +54,13 @@ public class BlazeLevel extends Level implements LevelInterface {
     }
 
     private void buildStartChunk(ChunkBuilder c){
-        c.buildChunks(0, 7, chunkWidth, chunkWidth, HILL_TOP);
+        c.buildChunks(0, floor-3, chunkWidth, chunkWidth, HILL_TOP);
     }
 
     private void buildFinalChunk(ChunkBuilder c, int startX){
         xExit = startX+4;
-        c.buildChunks(startX, 7, chunkWidth, chunkWidth, HILL_TOP);
+        yExit = floor-3;
+        c.buildChunks(startX, floor-3, chunkWidth, chunkWidth, HILL_TOP);
     }
 
     private void decorate(int xStart, int xLength, int floor) {
