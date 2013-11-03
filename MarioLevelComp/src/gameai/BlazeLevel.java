@@ -21,6 +21,37 @@ import java.util.Random;
 //C -> CC || CF
 
 public class BlazeLevel extends Level implements LevelInterface {
+    static class Tiles{
+        public static final byte ROCK = BlazeLevel.ROCK;
+        public static final byte GROUND = BlazeLevel.GROUND;
+
+        public static final byte HILL_TOP = BlazeLevel.HILL_TOP;
+        public static final byte HILL_TOP_LEFT = BlazeLevel.HILL_TOP_LEFT;
+        public static final byte HILL_TOP_LEFT_IN = BlazeLevel.HILL_TOP_LEFT_IN;
+        public static final byte HILL_TOP_RIGHT = BlazeLevel.HILL_TOP_RIGHT;
+        public static final byte HILL_TOP_RIGHT_IN = BlazeLevel.HILL_TOP_RIGHT_IN;
+        public static final byte HILL_FILL = BlazeLevel.HILL_FILL;
+        public static final byte HILL_LEFT = BlazeLevel.HILL_LEFT;
+        public static final byte HILL_RIGHT = BlazeLevel.HILL_RIGHT;
+
+        public static final byte LEFT_GRASS_EDGE = BlazeLevel.LEFT_GRASS_EDGE;
+        public static final byte LEFT_POCKET_GRASS = BlazeLevel.LEFT_POCKET_GRASS;
+        public static final byte LEFT_UP_GRASS_EDGE = BlazeLevel.LEFT_UP_GRASS_EDGE;
+        public static final byte RIGHT_GRASS_EDGE = BlazeLevel.RIGHT_GRASS_EDGE;
+        public static final byte RIGHT_POCKET_GRASS = BlazeLevel.RIGHT_POCKET_GRASS;
+        public static final byte RIGHT_UP_GRASS_EDGE = BlazeLevel.RIGHT_UP_GRASS_EDGE;
+
+        public static final byte BLOCK_COIN = BlazeLevel.BLOCK_COIN;
+        public static final byte BLOCK_EMPTY = BlazeLevel.BLOCK_EMPTY;
+        public static final byte BLOCK_POWERUP = BlazeLevel.BLOCK_POWERUP;
+        public static final byte COIN = BlazeLevel.COIN;
+
+        public static final byte TUBE_TOP_LEFT = BlazeLevel.TUBE_TOP_LEFT;
+        public static final byte TUBE_TOP_RIGHT = BlazeLevel.TUBE_TOP_RIGHT;
+        public static final byte TUBE_SIDE_LEFT = BlazeLevel.TUBE_SIDE_LEFT;
+        public static final byte TUBE_SIDE_RIGHT = BlazeLevel.TUBE_SIDE_RIGHT;
+    }
+
     static final int chunkWidth = 8;
     static final int floor = (int)Math.floor(Math.random()*10) + 7;
 
@@ -42,7 +73,7 @@ public class BlazeLevel extends Level implements LevelInterface {
     }
 
     private void buildChunk(ChunkBuilder c, int startX) {
-        c.buildChunks(startX, floor-3-(int)Math.floor(Math.random()*4), chunkWidth, chunkWidth, HILL_TOP);
+        c.buildChunks(startX, floor-3-(int)Math.floor(Math.random()*4), chunkWidth, chunkWidth);
 
         c.block_density = Math.random()*1;
 
@@ -56,13 +87,13 @@ public class BlazeLevel extends Level implements LevelInterface {
     }
 
     private void buildStartChunk(ChunkBuilder c){
-        c.buildChunks(0, floor-3, chunkWidth, chunkWidth, HILL_TOP);
+        c.buildChunks(0, floor-3, chunkWidth, chunkWidth);
     }
 
     private void buildFinalChunk(ChunkBuilder c, int startX){
         xExit = startX+4;
         yExit = floor-3;
-        c.buildChunks(startX, floor-3, chunkWidth, chunkWidth, HILL_TOP);
+        c.buildChunks(startX, floor-3, chunkWidth, chunkWidth);
     }
 
     private void decorate(int xStart, int xLength, int floor) {

@@ -32,7 +32,7 @@ public class ChunkBuilder {
         this.platform_size =  platform_size; //what is the "average" platform size
     }
 
-    public void buildChunks(int startX, int startY, int width, int height, byte block) {
+    public void buildChunks(int startX, int startY, int width, int height) {
         if (width <=0) {throw new IllegalArgumentException("buildChunks Exception : Need positive width");}
         if (height <=0) {throw new IllegalArgumentException("buildChunks Exception : Need positive height");}
 
@@ -40,7 +40,7 @@ public class ChunkBuilder {
         int[][] chunk = new int[width][height];
 
         sketchChunk(chunk, width, height); //populates array with 0's and 1's for blocks
-        setChunk(chunk, width, height, startX, startY, block); //set the actual tiles for the chunk
+        setChunk(chunk, width, height, startX, startY); //set the actual tiles for the chunk
     }
 
     public void sketchChunk(int[][] chunk, int width, int height) {
@@ -67,11 +67,11 @@ public class ChunkBuilder {
         }
     }
 
-    private void setChunk(int[][] chunk, int width, int height, int startX, int startY, byte block) {
+    private void setChunk(int[][] chunk, int width, int height, int startX, int startY) {
         //Traverse each row of the array:
         for(int x=0; x < width; x++) {
             for(int y=0; y < height; y++) {
-                if(chunk[x][y] == 1) {lvl.setBlock(x+startX, y+startY, block);}
+                if(chunk[x][y] == 1) {lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.HILL_TOP);}
             }
         }
     }
