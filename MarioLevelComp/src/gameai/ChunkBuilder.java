@@ -48,8 +48,6 @@ public class ChunkBuilder {
         int center_block = height / 2;
         double block_chance = 1.0; //how likely are we to place a block
         int continuous_blocks = 0; //Did we just place a block
-        int start_center = 0;
-        int end_center = 0;
 
         chunk[0][center_block] = 1;
         chunk[width - 1][center_block] = 1;
@@ -57,11 +55,9 @@ public class ChunkBuilder {
         for(int y=0; y < height; y++) {
             for(int x=0; x < width; x++) {
                 //When was the last block placed? What are our chances to dropping a block?
-                block_chance = calculateBlockChance(continuous_blocks);
-                //Is there a ledge (block->gap or gap->ledge) above us?
-                //boolean beneath_ledge = underLedgeCheck();
+                block_chance = calculateBlockChance(chunk, continuous_blocks, width, height, x, y);
                 double block_picker = Math.random();
-                //If we are going to place a block
+                //Is our picker within block_chance
                 if(block_picker < block_chance) {
                     chunk[x][y] = 1;
                     continuous_blocks++;
@@ -71,7 +67,7 @@ public class ChunkBuilder {
         }
     }
 
-    public void setChunk(int[][] chunk, int width, int height, int startX, int startY, byte block) {
+    private void setChunk(int[][] chunk, int width, int height, int startX, int startY, byte block) {
         //Traverse each row of the array:
         for(int x=0; x < width; x++) {
             for(int y=0; y < height; y++) {
@@ -80,16 +76,25 @@ public class ChunkBuilder {
         }
     }
 
-    public double calculateBlockChance(int continuous_blocks) {
+    private double calculateBlockChance(int[][] chunk, int continuous_blocks, int width, int height, int x, int y) {
         double block_chance = 0.0;
-
         if (continuous_blocks < platform_size) {
-            block_chance = block_density + (continuous_blocks * 0.2);// - calculateBlockChance();
+            block_chance = block_density + (continuous_blocks * 0.2);
         }
         else {
-            block_chance = block_density - (continuous_blocks * 0.2);// - calculateBlockChance();
+            block_chance = block_density - (continuous_blocks * 0.2);
         }
+        //Is there a ledge (block->gap or gap->ledge) above us?
+        boolean beneath_ledge = underLedgeCheck(chunk, width, height, x, y);
+        if (beneath_ledge) {block_chance += 0.3;}
         return block_chance;
+    }
+
+    private boolean underLedgeCheck(int[][] chunk, int width, int height, int x, int y) {
+        if ((x == 0 || x == width - 1) || y <= jumpHeight) {return false;}
+        boolean block_gap = (chunk[x-1][y-jumpHeight] == 1) && (chunk[x][y-jumpHeight] == 0);
+        boolean gap_block = (chunk[x+1][y-jumpHeight] == 1) && (chunk[x][y-jumpHeight] == 0);
+        return block_gap || gap_block;
     }
 
 }
