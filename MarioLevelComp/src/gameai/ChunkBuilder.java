@@ -17,14 +17,25 @@ import java.util.Random;
  * To change this template use File | Settings | File Templates.
  */
 
+/*
+ Values Important for Chunk Generation
+ - Length : changes how many chunks are made
+ - Block Density : changes number of blocks in a chunk
+ - Platform Average : What is the "average" number of contiguous blocks
+ - Pillars : changes the chances of a placed block being designated as the top of a column
+ - Floor : changes the chances of any given row being the "top" of the floor (aka all beneath it are filled in)
+ */
+
 //A chunk builder object is created to spit out chunks for a level
 public class ChunkBuilder {
 
     //members
     int jumpHeight = 3; //This is used to determine the max height blocks can be spaced vertically
+    Level lvl;
     double block_density;
     int platform_size;
-    Level lvl;
+    double pillars = 0.2;
+    double floor = 0.1;
 
     public ChunkBuilder(Level lvl, double block_density, int platform_size) {
         this.lvl = lvl;
@@ -33,8 +44,8 @@ public class ChunkBuilder {
     }
 
     public void buildChunks(int startX, int startY, int width, int height) {
-        if (width <=0) {throw new IllegalArgumentException("buildChunks Exception : Need positive width");}
-        if (height <=0) {throw new IllegalArgumentException("buildChunks Exception : Need positive height");}
+        if (width <= 0) {throw new IllegalArgumentException("buildChunks Exception : Need positive width");}
+        if (height <= 0) {throw new IllegalArgumentException("buildChunks Exception : Need positive height");}
 
         //Build a 2D array of width by height
         int[][] chunk = new int[width][height];
@@ -51,18 +62,35 @@ public class ChunkBuilder {
 
         chunk[0][center_block] = 1;
         chunk[width - 1][center_block] = 1;
+        int[] columns = new int[width];
+        int floor_top = height+1; //just a junk value
+
         //Traverse each row of the array:
         for(int y=0; y < height; y++) {
             for(int x=0; x < width; x++) {
-                //When was the last block placed? What are our chances to dropping a block?
-                block_chance = calculateBlockChance(chunk, continuous_blocks, width, height, x, y);
-                double block_picker = Math.random();
-                //Is our picker within block_chance
-                if(block_picker < block_chance) {
+                if (y > floor_top || columns[x] == 1) {
                     chunk[x][y] = 1;
-                    continuous_blocks++;
                 }
-                else {continuous_blocks = 0;}
+                else {
+                    //When was the last block placed? What are our chances to dropping a block?
+                    block_chance = calculateBlockChance(chunk, continuous_blocks, width, height, x, y);
+                    double block_picker = Math.random();
+                    //Is our picker within block_chance
+                    if(block_picker < block_chance) {
+                        chunk[x][y] = 1;
+                        continuous_blocks++;
+
+                        if (block_picker < pillars) {
+                            chunk[x][y] = 1;
+                            columns[x] = 1;
+                        }
+
+                        if (block_picker < floor) {
+                            floor = y;
+                        }
+                    }
+                    else {continuous_blocks = 0;}
+                }
             }
         }
     }
