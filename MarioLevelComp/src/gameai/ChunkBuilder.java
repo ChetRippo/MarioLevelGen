@@ -97,9 +97,28 @@ public class ChunkBuilder {
 
     private void setChunk(int[][] chunk, int width, int height, int startX, int startY) {
         //Traverse each row of the array:
-        for(int x=0; x < width; x++) {
-            for(int y=0; y < height; y++) {
-                if(chunk[x][y] == 1) {lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.HILL_TOP);}
+        for(int y=0; y < height; y++) {
+            for(int x=0; x < width; x++) {
+                //paint each block appropriately
+                if(chunk[x][y] == 1) {
+                    /*
+                    * Build an array that will keep track of the position of
+                    * the block relative to the whole chunk, so we can decorate it
+                    * as top-left, or floating, or ground etc
+                    *
+                    * [TOP | FLOATING | LEFT | RIGHT]
+                    * */
+                    boolean[] checks = new boolean[4];
+                    //if top block
+                    checks[0] = checkBlockTop(chunk, x, y);
+                    //if floating box
+                    checks[1] = checkBlockFloat(chunk, x, y, height);
+                    //if left wall
+                    checks[2] = checkBlockLeft(chunk, x, y);
+                    //if right wall
+                    checks[3] = checkBlockRight(chunk, x, y, width);
+                    checkChunkChecks(checks, x, startX, y, startY);
+                }
             }
         }
     }
@@ -113,16 +132,86 @@ public class ChunkBuilder {
             block_chance = block_density - (continuous_blocks * 0.2);
         }
         //Is there a ledge (block->gap or gap->ledge) above us?
-        boolean beneath_ledge = underLedgeCheck(chunk, width, height, x, y);
+        boolean beneath_ledge = checkUnderLedge(chunk, width, height, x, y);
         if (beneath_ledge) {block_chance += 0.3;}
         return block_chance;
     }
 
-    private boolean underLedgeCheck(int[][] chunk, int width, int height, int x, int y) {
+    private boolean checkUnderLedge(int[][] chunk, int width, int height, int x, int y) {
         if ((x == 0 || x == width - 1) || y <= jumpHeight) {return false;}
         boolean block_gap = (chunk[x-1][y-jumpHeight] == 1) && (chunk[x][y-jumpHeight] == 0);
         boolean gap_block = (chunk[x+1][y-jumpHeight] == 1) && (chunk[x][y-jumpHeight] == 0);
         return block_gap || gap_block;
+    }
+
+    private void checkChunkChecks(boolean[] checks, int x, int startX, int y, int startY) {
+        //HERE IT COMES BREATT
+        //top checks
+        if(checks[0]) {
+            //float
+            if(checks[1]) {
+                lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.BLOCK_COIN);
+            }
+            //top single (top of a pillar
+            else if (checks[2] && checks[3]) {
+                lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.ROCK);
+            }
+            //top left
+            else if (checks[2]) {
+                lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.LEFT_UP_GRASS_EDGE);
+            }
+            //top right
+            else {
+                lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.RIGHT_UP_GRASS_EDGE);
+            }
+        }
+        else {
+            //if floating
+            if (checks[1]) {
+                lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.COIN); //coin for fun
+            }
+            //middle left
+            else if (checks[2]) {
+                lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.LEFT_GRASS_EDGE);
+            }
+            //middle right
+            else if (checks[3]) {
+                lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.RIGHT_GRASS_EDGE);
+            }
+            //center, unreachable
+            else {
+                lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.GROUND);
+            }
+        }
+    }
+
+    private boolean checkBlockTop(int[][] chunk, int x, int y) {
+        if (y == 0) {return true;}
+        if (y > 0) {
+            if(chunk[x][y-1] != 1) {return true;}
+        }
+        return false;
+    }
+
+    private boolean checkBlockFloat(int[][] chunk, int x, int y, int height) {
+        if (y < height - 1) {
+            if(chunk[x][y+1] != 1) {return true;}
+        }
+        return false;
+    }
+
+    private boolean checkBlockLeft(int[][] chunk, int x, int y) {
+        if(x == 0) {return true;}
+        if(x > 0) {
+            if(chunk[x-1][y] != 1) {return true;}
+        }
+        return false;
+    }
+    private boolean checkBlockRight(int[][] chunk, int x, int y, int width) {
+        if(x < width -1) {
+            if(chunk[x+1][y] != 1){return true;}
+        }
+        return false;
     }
 
 }
