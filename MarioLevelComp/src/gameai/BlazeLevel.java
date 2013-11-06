@@ -74,7 +74,8 @@ public class BlazeLevel extends Level implements LevelInterface {
     }
 
     private void buildChunk(ChunkBuilder c, int startX) {
-        c.buildChunks(startX, floor-3-(int)Math.floor(Math.random()*4), chunkWidth, chunkWidth);
+        int chunkFloor = (floor - 3 - (int)Math.floor(Math.random()*4));
+        c.buildChunks(startX, chunkFloor, chunkWidth, chunkWidth);
 
         c.block_density = Math.random()*1;
 
@@ -85,6 +86,8 @@ public class BlazeLevel extends Level implements LevelInterface {
         }else{
             buildChunk(c, startX+chunkWidth);
         }
+
+        //decorate(startX, 30, (int)Math.floor(Math.random()*12));
     }
 
     private void buildStartChunk(ChunkBuilder c){
@@ -96,51 +99,4 @@ public class BlazeLevel extends Level implements LevelInterface {
         yExit = floor-3;
         c.buildChunks(startX, floor-3, chunkWidth, chunkWidth);
     }
-
-    private void decorate(int xStart, int xLength, int floor) {
-        //if its at the very top, just return
-        if (floor < 1)
-            return;
-        boolean rocks = true;
-
-        int s = (int)Math.floor(Math.random()*4)+1;
-        int e = (int)Math.floor(Math.random()*4)+1;
-
-        if (floor - 2 > 0) {
-            if ((xLength - 1 - e) - (xStart + 1 + s) > 1) {
-                for (int x = xStart + 1 + s; x < xLength - 1 - e; x++) {
-                    setBlock(x, floor - 2, (byte) (2 + 2 * 16));
-                }
-            }
-        }
-
-        s = (int)Math.floor(Math.random()*4)+1;
-        e = (int)Math.floor(Math.random()*4)+1;
-
-        if (floor - 4 > 0) {
-            if ((xLength - 1 - e) - (xStart + 1 + s) > 2) {
-                for (int x = xStart + 1 + s; x < xLength - 1 - e; x++) {
-                    if (rocks) {
-                        if (x != xStart + 1 && x != xLength - 2 &&
-                                Math.floor(Math.random()*2) == 0) {
-                            if (Math.floor(Math.random()*2) == 0) {
-                                setBlock(x, floor - 4, BLOCK_POWERUP);
-                            } else {
-                                setBlock(x, floor - 4, BLOCK_EMPTY);
-                            }
-                        } else if (Math.floor(Math.random()*4) == 0) {
-                            if (Math.floor(Math.random()*4) == 0) {
-                                setBlock(x, floor - 4, (byte) (2 + 1 * 16));
-                            } else {
-                                setBlock(x, floor - 4, (byte) (1 + 1 * 16));
-                            }
-                        } else {
-                            setBlock(x, floor - 4, BLOCK_EMPTY);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
 }

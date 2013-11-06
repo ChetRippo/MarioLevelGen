@@ -52,6 +52,7 @@ public class ChunkBuilder {
 
         sketchChunk(chunk, width, height); //populates array with 0's and 1's for blocks
         setChunk(chunk, width, height, startX, startY); //set the actual tiles for the chunk
+        setBelowChunk(chunk, width, height, startX, startY);// populate tiles under a chunk (I figured I'd make this separate since it chunks have different types the area under them should change)
     }
 
     public void sketchChunk(int[][] chunk, int width, int height) {
@@ -118,6 +119,16 @@ public class ChunkBuilder {
                     //if right wall
                     checks[3] = checkBlockRight(chunk, x, y, width);
                     checkChunkChecks(checks, x, startX, y, startY);
+                }
+            }
+        }
+    }
+
+    private void setBelowChunk(int[][]chunk, int width, int height, int startX, int startY){
+        for(int x = startX; x < startX+width; x++){
+            for(int y = startY+height; y < 22; y++){
+                if(lvl.getBlock(x, startY) != 0){
+                    lvl.setBlock(x, y, BlazeLevel.Tiles.GROUND);
                 }
             }
         }
