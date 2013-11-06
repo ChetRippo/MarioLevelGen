@@ -126,8 +126,8 @@ public class ChunkBuilder {
 
     private void setBelowChunk(int[][]chunk, int width, int height, int startX, int startY){
         for(int x = startX; x < startX+width; x++){
-            for(int y = startY+height; y < 22; y++){
-                if(lvl.getBlock(x, startY) != 0){
+            for(int y = startY+height-1; y < 23; y++){
+                if(lvl.getBlock(x, y) != 0){
                     lvl.setBlock(x, y, BlazeLevel.Tiles.GROUND);
                 }
             }
@@ -156,7 +156,6 @@ public class ChunkBuilder {
     }
 
     private void checkChunkChecks(boolean[] checks, int x, int startX, int y, int startY) {
-        //HERE IT COMES BREATT
         //top checks
         if(checks[0]) {
             //float
@@ -224,5 +223,4 @@ public class ChunkBuilder {
         }
         return false;
     }
-
 }
