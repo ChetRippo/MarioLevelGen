@@ -126,8 +126,12 @@ public class ChunkBuilder {
 
     private void setBelowChunk(int[][]chunk, int width, int height, int startX, int startY){
         for(int x = startX; x < startX+width; x++){
-            for(int y = startY+height-1; y < 23; y++){
-                if(lvl.getBlock(x, y) != 0){
+            boolean set = false;
+            for(int y = startY+height-2; y < 23; y++){
+                if(lvl.getBlock(x, y) != BlazeLevel.Tiles.BLOCK_EMPTY && lvl.getBlock(x, y) != BlazeLevel.Tiles.COIN && lvl.getBlock(x, y) != BlazeLevel.Tiles.BLOCK_COIN && lvl.getBlock(x, y) != BlazeLevel.Tiles.BLOCK_POWERUP && lvl.getBlock(x, y) != 0){
+                    set = true;
+                }
+                if(set && lvl.getBlock(x, y) == 0){
                     lvl.setBlock(x, y, BlazeLevel.Tiles.GROUND);
                 }
             }
