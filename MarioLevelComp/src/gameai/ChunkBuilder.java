@@ -223,7 +223,11 @@ public class ChunkBuilder {
         else {
             //if floating
             if (checks[1]) {
-                lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.COIN); //coin for fun
+                lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.GROUND); //coin for fun
+            }
+            //middle single column
+            else if (checks[2] && checks[3]) {
+                lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.ROCK);
             }
             //middle left
             else if (checks[2]) {
