@@ -69,13 +69,25 @@ public class BlazeLevel extends Level implements LevelInterface {
 
         buildStartChunk(c);
 
-        buildChunk(c, chunkWidth);
+        buildChunk(c, chunkWidth, 'p');
 
     }
 
-    private void buildChunk(ChunkBuilder c, int startX) {
+    private char getChunkType(double rand, char currentType){
+        if(rand > 0.6){
+            if(currentType == 'n'){
+                return 'p';
+            }else{
+                return 'n';
+            }
+        }else{
+            return currentType;
+        }
+    }
+
+    private void buildChunk(ChunkBuilder c, int startX, char type) {
         int chunkFloor = (floor - 3 - (int)Math.floor(Math.random()*4));
-        c.buildChunks(startX, chunkFloor, chunkWidth, chunkWidth);
+        c.buildChunks(startX, chunkFloor, chunkWidth, chunkWidth, type);
 
         c.block_density = Math.random()*1;
 
@@ -84,18 +96,18 @@ public class BlazeLevel extends Level implements LevelInterface {
         if(last){
             buildFinalChunk(c, startX + chunkWidth);
         }else{
-            buildChunk(c, startX+chunkWidth);
+            buildChunk(c, startX+chunkWidth, getChunkType(Math.random(), type));
         }
     }
 
     private void buildStartChunk(ChunkBuilder c){
-        c.buildChunks(0, floor-3, chunkWidth, chunkWidth);
+        c.buildChunks(0, floor-3, chunkWidth, chunkWidth, 'n');
     }
 
     private void buildFinalChunk(ChunkBuilder c, int startX){
         xExit = startX+4;
         yExit = floor-3;
-        c.buildChunks(startX, floor-3, chunkWidth, chunkWidth);
+        c.buildChunks(startX, floor-3, chunkWidth, chunkWidth, 'n');
     }
 
 

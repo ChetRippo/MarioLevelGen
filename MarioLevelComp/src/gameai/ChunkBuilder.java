@@ -43,16 +43,33 @@ public class ChunkBuilder {
         this.platform_size =  platform_size; //what is the "average" platform size
     }
 
-    public void buildChunks(int startX, int startY, int width, int height) {
+    public void buildChunks(int startX, int startY, int width, int height, char type) {
         if (width <= 0) {throw new IllegalArgumentException("buildChunks Exception : Need positive width");}
         if (height <= 0) {throw new IllegalArgumentException("buildChunks Exception : Need positive height");}
 
         //Build a 2D array of width by height
         int[][] chunk = new int[width][height];
 
+        //n - normal, flatish terrain
+        //q - question blocks everywhere
+        //p - small platforms
+
+        switch(type){
+            case 'n':
+                this.block_density = Math.random()*1.1;
+                this.platform_size = 9;
+                this.pillars = 0.2;
+                break;
+            case 'p':
+                this.block_density = Math.random()*0.25;
+                this.platform_size = 2;
+                this.pillars = 0.01;
+                break;
+        }
+
         sketchChunk(chunk, width, height); //populates array with 0's and 1's for blocks
-        setChunk(chunk, width, height, startX, startY); //set the actual tiles for the chunk
-        setBelowChunk(chunk, width, height, startX, startY);// populate tiles under a chunk (I figured I'd make this separate since it chunks have different types the area under them should change)
+        setChunk(chunk, width, height, startX, startY, type); //set the actual tiles for the chunk
+        setBelowChunk(chunk, width, height, startX, startY, type);// populate tiles under a chunk (I figured I'd make this separate since it chunks have different types the area under them should change)
     }
 
     public void sketchChunk(int[][] chunk, int width, int height) {
@@ -96,7 +113,7 @@ public class ChunkBuilder {
         }
     }
 
-    private void setChunk(int[][] chunk, int width, int height, int startX, int startY) {
+    private void setChunk(int[][] chunk, int width, int height, int startX, int startY, char type) {
         //Traverse each row of the array:
         for(int y=0; y < height; y++) {
             for(int x=0; x < width; x++) {
@@ -118,13 +135,13 @@ public class ChunkBuilder {
                     checks[2] = checkBlockLeft(chunk, x, y);
                     //if right wall
                     checks[3] = checkBlockRight(chunk, x, y, width);
-                    checkChunkChecks(checks, x, startX, y, startY);
+                    checkChunkChecks(checks, x, startX, y, startY, type);
                 }
             }
         }
     }
 
-    private void setBelowChunk(int[][]chunk, int width, int height, int startX, int startY){
+    private void setBelowChunk(int[][]chunk, int width, int height, int startX, int startY, char type){
         for(int x = startX; x < startX+width; x++){
             boolean set = false;
             for(int y = startY+height-2; y < 23; y++){
@@ -132,7 +149,11 @@ public class ChunkBuilder {
                     set = true;
                 }
                 if(set && lvl.getBlock(x, y) == 0){
-                    lvl.setBlock(x, y, BlazeLevel.Tiles.GROUND);
+                    if(type == 'n'){
+                        lvl.setBlock(x, y, BlazeLevel.Tiles.GROUND);
+                    }else if(type == 'p'){
+                        lvl.setBlock(x, y, BlazeLevel.Tiles.ROCK);
+                    }
                 }
             }
         }
@@ -159,9 +180,14 @@ public class ChunkBuilder {
         return block_gap || gap_block;
     }
 
-    private void checkChunkChecks(boolean[] checks, int x, int startX, int y, int startY) {
+    private void checkChunkChecks(boolean[] checks, int x, int startX, int y, int startY, char type) {
+
+        if(type == 'p'){
+            lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.ROCK);
+        }
+
         //top checks
-        if(checks[0]) {
+        else if(checks[0]) {
             //float
             if(checks[1]) {
                 lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.BLOCK_COIN);
