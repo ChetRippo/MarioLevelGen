@@ -175,8 +175,10 @@ public class ChunkBuilder {
                 lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.LEFT_UP_GRASS_EDGE);
             }
             //top right
-            else {
+            else if(checks[3]){
                 lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.RIGHT_UP_GRASS_EDGE);
+            }else{
+                lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.HILL_TOP);
             }
         }
         else {
@@ -200,7 +202,7 @@ public class ChunkBuilder {
     }
 
     private boolean checkBlockTop(int[][] chunk, int x, int y) {
-        if (y == 0) {return true;}
+        if (y == 0 || y > 20) {return true;}
         if (y > 0) {
             if(chunk[x][y-1] != 1) {return true;}
         }
@@ -208,8 +210,8 @@ public class ChunkBuilder {
     }
 
     private boolean checkBlockFloat(int[][] chunk, int x, int y, int height) {
-        if (y < height - 1) {
-            if(chunk[x][y+1] != 1) {return true;}
+        if (y < height - 3) {
+            if(chunk[x][y+1] != 1 && chunk[x][y+2] != 1 && chunk[x][y+3] != 1)  {return true;}
         }
         return false;
     }
@@ -217,7 +219,10 @@ public class ChunkBuilder {
     private boolean checkBlockLeft(int[][] chunk, int x, int y) {
         if(x == 0) {return true;}
         if(x > 0) {
-            if(chunk[x-1][y] != 1) {return true;}
+            try{if(chunk[x-1][y] != 1 && !(chunk[x][y+1] != 1 && chunk[x][y-1] !=1)) {return true;}}
+            catch(ArrayIndexOutOfBoundsException z){
+                return false;
+            }
         }
         return false;
     }
