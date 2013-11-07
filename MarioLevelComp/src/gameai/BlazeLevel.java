@@ -76,9 +76,17 @@ public class BlazeLevel extends Level implements LevelInterface {
     private char getChunkType(double rand, char currentType){
         if(rand > 0.6){
             if(currentType == 'n'){
-                return 'p';
+                if(rand > 0.7){
+                    return 'p';
+                }else{
+                    return 'q';
+                }
             }else{
-                return 'n';
+                if(rand > 0.7){
+                    return 'n';
+                }else{
+                    return 'q';
+                }
             }
         }else{
             return currentType;
@@ -92,7 +100,7 @@ public class BlazeLevel extends Level implements LevelInterface {
         c.block_density = Math.random()*1;
 
         int isLastChunk = (int)Math.floor(Math.random()*startX);
-        boolean last = (isLastChunk > 60);
+        boolean last = (isLastChunk > 100);
         if(last){
             buildFinalChunk(c, startX + chunkWidth);
         }else{

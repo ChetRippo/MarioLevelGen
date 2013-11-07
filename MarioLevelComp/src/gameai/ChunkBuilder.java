@@ -56,8 +56,11 @@ public class ChunkBuilder {
 
         switch(type){
             case 'n':
-                this.block_density = Math.random()*1.1;
-                this.platform_size = 9;
+                this.block_density = Math.random();
+                if(this.block_density < 0.2){
+                    this.block_density = 0.2;
+                }
+                this.platform_size = (int)Math.floor(Math.random()*12)+4;
                 this.pillars = 0.2;
                 break;
             case 'p':
@@ -65,6 +68,12 @@ public class ChunkBuilder {
                 this.platform_size = 2;
                 this.pillars = 0.01;
                 break;
+            case 'q':
+                this.block_density = Math.random();
+                this.platform_size = 4;
+                this.pillars = 0.7;
+                break;
+
         }
 
         sketchChunk(chunk, width, height); //populates array with 0's and 1's for blocks
@@ -142,17 +151,19 @@ public class ChunkBuilder {
     }
 
     private void setBelowChunk(int[][]chunk, int width, int height, int startX, int startY, char type){
-        for(int x = startX; x < startX+width; x++){
-            boolean set = false;
-            for(int y = startY+height-2; y < 23; y++){
-                if(lvl.getBlock(x, y) != BlazeLevel.Tiles.BLOCK_EMPTY && lvl.getBlock(x, y) != BlazeLevel.Tiles.COIN && lvl.getBlock(x, y) != BlazeLevel.Tiles.BLOCK_COIN && lvl.getBlock(x, y) != BlazeLevel.Tiles.BLOCK_POWERUP && lvl.getBlock(x, y) != 0){
-                    set = true;
-                }
-                if(set && lvl.getBlock(x, y) == 0){
-                    if(type == 'n'){
-                        lvl.setBlock(x, y, BlazeLevel.Tiles.GROUND);
-                    }else if(type == 'p'){
-                        lvl.setBlock(x, y, BlazeLevel.Tiles.ROCK);
+        if(type != 'q'){
+            for(int x = startX; x < startX+width; x++){
+                boolean set = false;
+                for(int y = startY+height-2; y < 23; y++){
+                    if(lvl.getBlock(x, y) != BlazeLevel.Tiles.BLOCK_EMPTY && lvl.getBlock(x, y) != BlazeLevel.Tiles.COIN && lvl.getBlock(x, y) != BlazeLevel.Tiles.BLOCK_COIN && lvl.getBlock(x, y) != BlazeLevel.Tiles.BLOCK_POWERUP && lvl.getBlock(x, y) != 0){
+                        set = true;
+                    }
+                    if(set && lvl.getBlock(x, y) == 0){
+                        if(type == 'n'){
+                            lvl.setBlock(x, y, BlazeLevel.Tiles.GROUND);
+                        }else if(type == 'p'){
+                            lvl.setBlock(x, y, BlazeLevel.Tiles.ROCK);
+                        }
                     }
                 }
             }
@@ -184,6 +195,8 @@ public class ChunkBuilder {
 
         if(type == 'p'){
             lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.ROCK);
+        }else if(type == 'q'){
+            lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.BLOCK_POWERUP);
         }
 
         //top checks
