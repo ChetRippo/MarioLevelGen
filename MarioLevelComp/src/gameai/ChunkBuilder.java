@@ -211,18 +211,19 @@ public class ChunkBuilder {
             int next_height = -1;
             for(int y=0; y < height; y++) {
                 int height_count = 0;
-                //if we haven't seen next height yet, check if next column has next height
-                if(next_height == -1 && chunk[x+1][y] == 1) {
-                    next_height = y;
+                //if we haven't seen next height yet
+                if(next_height == -1) {
+                    if(chunk[x+1][y] == 0) {
+                        next_height = y;
+                    }
                 }
-                else if (next_height != -1){
+                else {
                     height_count++;
                 }
 
-                //If we are at jump height, place a block so the player can make the jump
-                if(height_count == jumpHeight) {
+                //if it has been jumpHeight since last platform, force block
+                if(height_count > jumpHeight) {
                     chunk[x][y] = 1;
-                    break;
                 }
             }
         }
@@ -272,6 +273,7 @@ public class ChunkBuilder {
                 String out = "";
                 if(chunk[x][y] == 0) {out = " ";}
                 else if(chunk[x][y] == 2) {out = "∆";}
+                else if(chunk[x][y] == 3) {out = "-";}
                 else {out = "X";}
                 if(x != width - 1) {out = out + "|";}
                 System.out.print(out);
