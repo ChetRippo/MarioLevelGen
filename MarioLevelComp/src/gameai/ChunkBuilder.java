@@ -309,6 +309,10 @@ public class ChunkBuilder {
                     checks[3] = checkBlockRight(chunk, x, y, width);
                     //lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.ROCK); //test to see if checkChunkChecks is messing up
                     checkChunkChecks(checks, x, startX, y, startY, type); //uncomment to try and block for every 1
+
+                }
+                if(chunk[x][y] == 2){
+                    lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.COIN);
                 }
             }
         }
@@ -364,55 +368,55 @@ public class ChunkBuilder {
 
     private void checkChunkChecks(boolean[] checks, int x, int startX, int y, int startY, char type) {
 
-        if(type == 'p'){
-            lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.ROCK);
-        }else if(type == 'q'){
-            lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.BLOCK_POWERUP);
-        }
+            if(type == 'p'){
+                lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.ROCK);
+            }else if(type == 'q'){
+                lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.BLOCK_POWERUP);
+            }
 
-        //top checks
-        else if(checks[0]) {
-            //float
-            if(checks[1]) {
-                lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.BLOCK_COIN);
+            //top checks
+            else if(checks[0]) {
+                //float
+                if(checks[1]) {
+                    lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.BLOCK_COIN);
+                }
+                //top single (top of a pillar
+                else if (checks[2] && checks[3]) {
+                    lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.ROCK);
+                }
+                //top left
+                else if (checks[2]) {
+                    lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.LEFT_UP_GRASS_EDGE);
+                }
+                //top right
+                else if(checks[3]){
+                    lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.RIGHT_UP_GRASS_EDGE);
+                }else{
+                    lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.HILL_TOP);
+                }
             }
-            //top single (top of a pillar
-            else if (checks[2] && checks[3]) {
-                lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.ROCK);
-            }
-            //top left
-            else if (checks[2]) {
-                lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.LEFT_UP_GRASS_EDGE);
-            }
-            //top right
-            else if(checks[3]){
-                lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.RIGHT_UP_GRASS_EDGE);
-            }else{
-                lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.HILL_TOP);
-            }
-        }
-        else {
-            //if floating
-            if (checks[1]) {
-                lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.GROUND); //coin for fun
-            }
-            //middle single column
-            else if (checks[2] && checks[3]) {
-                lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.ROCK);
-            }
-            //middle left
-            else if (checks[2]) {
-                lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.LEFT_GRASS_EDGE);
-            }
-            //middle right
-            else if (checks[3]) {
-                lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.RIGHT_GRASS_EDGE);
-            }
-            //center, unreachable
             else {
-                lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.GROUND);
+                //if floating
+                if (checks[1]) {
+                    lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.GROUND); //coin for fun
+                }
+                //middle single column
+                else if (checks[2] && checks[3]) {
+                    lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.ROCK);
+                }
+                //middle left
+                else if (checks[2]) {
+                    lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.LEFT_GRASS_EDGE);
+                }
+                //middle right
+                else if (checks[3]) {
+                    lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.RIGHT_GRASS_EDGE);
+                }
+                //center, unreachable
+                else {
+                    lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.GROUND);
+                }
             }
-        }
     }
 
     private boolean checkBlockTop(int[][] chunk, int x, int y) {

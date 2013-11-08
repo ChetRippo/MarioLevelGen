@@ -56,8 +56,7 @@ public class BlazeLevel extends Level implements LevelInterface {
     int chunkWidth = randomking.nextInt(18) + 10;
     static final int floor = (int)Math.floor(Math.random()*5) + 10;
 
-    static int chunksToMake = (int)Math.floor(Math.random()*30)+10;
-
+    private static int totalChunks = 0;
     public int[][] sketchedLevel = new int[8][30];
 
     public BlazeLevel(int width, int height, long seed, int difficulty,
@@ -81,17 +80,9 @@ public class BlazeLevel extends Level implements LevelInterface {
     private char getChunkType(double rand, char currentType){
         if(rand > 0.6){
             if(currentType == 'n'){
-                //if(rand > 0.7){
                     return 'p';
-                //}else{
-                //    return 'q';
-                //}
             }else{
-                //if(rand > 0.7){
                     return 'n';
-                //}else{
-                  //  return 'q';
-                //}
             }
         }else{
             return currentType;
@@ -100,7 +91,7 @@ public class BlazeLevel extends Level implements LevelInterface {
 
     private void buildChunk(ChunkBuilder c, int startX, char type) {
         int chunkFloor = (floor - 3 - (int)Math.floor(Math.random()*4));
-        int[][] chunk = c.buildChunks(startX, chunkFloor, chunkWidth, chunkWidth, type);
+        int[][] chunk = c.buildChunks(startX, chunkFloor, chunkWidth, 22-floor, type);
 
         addChunkToSketchedLevel(chunk);
 
@@ -108,11 +99,9 @@ public class BlazeLevel extends Level implements LevelInterface {
         //int i = generator.nextInt(10) + 1;
         c.block_density = Math.random()*1;
 
-        chunksToMake--;
-
         chunkWidth = randomking.nextInt(6) + 3;
-
-        if(chunksToMake == 0){
+        totalChunks++;
+        if(Math.random()*totalChunks > 15){
             buildFinalChunk(c, startX + chunkWidth);
         }else{
             buildChunk(c, startX+chunkWidth, getChunkType(Math.random(), type));
@@ -120,15 +109,15 @@ public class BlazeLevel extends Level implements LevelInterface {
     }
 
     private void buildStartChunk(ChunkBuilder c){
-        int[][] chunk = c.buildChunks(0, floor-3, chunkWidth, chunkWidth, 'n');
+        int[][] chunk = c.buildChunks(0, floor-3, chunkWidth, 22-floor, 'n');
 
         addChunkToSketchedLevel(chunk);
     }
 
     private void buildFinalChunk(ChunkBuilder c, int startX){
-        xExit = startX+4;
+        xExit = startX;
         yExit = floor-3;
-        int[][] chunk = c.buildChunks(startX, floor-3, chunkWidth, chunkWidth, 'n');
+        int[][] chunk = c.buildChunks(startX, floor-3, chunkWidth, 22-floor, 'n');
 
         addChunkToSketchedLevel(chunk);
     }
