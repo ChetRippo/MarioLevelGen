@@ -30,7 +30,7 @@ import java.util.Random;
 public class ChunkBuilder {
 
     //members
-    int jumpHeight = 3; //This is used to determine the max height blocks can be spaced vertically
+    int jumpHeight = 4; //This is used to determine the max height blocks can be spaced vertically
     int jumpLength = 4;
     Level lvl;
     double block_density;
@@ -134,8 +134,10 @@ public class ChunkBuilder {
                 }
             }
         }
-        //NOW GET TUNNELING!
+        //Given the solid block, dig out tunnels
         digTunnels(chunk, width, height);
+        //Now make sure all vertical jumps are feasable
+        heightCritic(chunk, width, height);
     }
 
     /*
@@ -184,7 +186,7 @@ public class ChunkBuilder {
                         //lets see if its part of the tunnel between  exit and entrance
                         if (x > entrance[0] && x < exit[0] && y < tunnel_floor) {
                             //if there is a block above us, we can have a ceiling and its safe to dig
-                            if(!checkBlockTop(chunk, x, y)) {
+                            if((y > 0 ) && !isTopGround(chunk, x, y-1)) {
                                 chunk[x][y] = 2; //may end up being 2 later
                             }
                         }
@@ -196,6 +198,34 @@ public class ChunkBuilder {
         printChunkInfo(chunk, width, height);
         System.out.printf("Entrance: %b, Exit: %b, EnLoc: %d,%d, ExLox: %d,%d, floor: %d\n\n",
                 placedEntrance, placedExit, entrance[1],entrance[1], exit[0],exit[1], tunnel_floor);
+    }
+
+    /*
+     Pass over each column and make sure that the gap between the top of the next
+     column and the "floor" of this column is no greater than jumpHeight
+
+     If it is not, place a block (set to 1)
+     */
+    private void heightCritic(int[][] chunk, int width, int height) {
+        for(int x=0; x < width - 1; x++) { //check all but second-to-last column
+            int next_height = -1;
+            for(int y=0; y < height; y++) {
+                int height_count = 0;
+                //if we haven't seen next height yet, check if next column has next height
+                if(next_height == -1 && chunk[x+1][y] == 1) {
+                    next_height = y;
+                }
+                else if (next_height != -1){
+                    height_count++;
+                }
+
+                //If we are at jump height, place a block so the player can make the jump
+                if(height_count == jumpHeight) {
+                    chunk[x][y] = 1;
+                    break;
+                }
+            }
+        }
     }
 
     //is this spot a good place for a tunnel entrance
