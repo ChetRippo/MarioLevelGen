@@ -30,6 +30,7 @@ import java.util.Random;
 public class ChunkBuilder {
 
     //members
+    Random fate = new Random();
     int jumpHeight = 4; //This is used to determine the max height blocks can be spaced vertically
     int jumpLength = 4;
     Level lvl;
@@ -135,7 +136,11 @@ public class ChunkBuilder {
             }
         }
         //Given the solid block, dig out tunnels
-        digTunnels(chunk, width, height);
+        int tunnel_pass = fate.nextInt(3);
+        while(tunnel_pass > 0) {
+            digTunnels(chunk, width, height);
+            tunnel_pass--;
+        }
         //Now make sure all vertical jumps are feasable
         heightCritic(chunk, width, height);
     }
@@ -209,11 +214,11 @@ public class ChunkBuilder {
     private void heightCritic(int[][] chunk, int width, int height) {
         for(int x=0; x < width - 1; x++) { //check all but second-to-last column
             int next_height = -1;
+            int height_count = 0;
             for(int y=0; y < height; y++) {
-                int height_count = 0;
                 //if we haven't seen next height yet
                 if(next_height == -1) {
-                    if(chunk[x+1][y] == 0) {
+                    if(chunk[x+1][y] == 1) {
                         next_height = y;
                     }
                 }
@@ -222,7 +227,8 @@ public class ChunkBuilder {
                 }
 
                 //if it has been jumpHeight since last platform, force block
-                if(height_count > jumpHeight) {
+                if(height_count >= jumpHeight-1) {
+                    //System.out.println("HEIGHT CRITIC SAID ENOUGH IS ENOUGH");
                     chunk[x][y] = 1;
                 }
             }
@@ -234,16 +240,16 @@ public class ChunkBuilder {
         boolean check = isTopGround(chunk,x,y) && !checkBlockFloat(chunk, x, y, height) && !checkBlockRight(chunk, x, y, width) && !checkBlockLeft(chunk, x, y);
         //boolean ground_top, ground_left, ground_right,
         //TODO:make it possible for first columns to be entrances, make tunnels shoot off front
-        check = check && x != 0;
-        return check;
+        int threshold = 4;
+        if (fate.nextInt(10) > threshold) {return check;}
+        return false;
     }
 
     //is this spot a good place for a tunnel exit
     private boolean isLegalExit(int x, int y, int[][] chunk, int width, int height, int[] entrance) {
         boolean check = isTopGround(chunk, x, y) && !checkBlockFloat(chunk, x, y, height) && !checkBlockRight(chunk, x, y, width) && !checkBlockLeft(chunk, x, y);
         //TODO:make it possible for last columns to be entrances, make tunnels shoot off end
-        int threshold = 2;
-        Random fate = new Random();
+        int threshold = 4;
         if((x > entrance[0] + 2) && check) {
             //we can legally add a tunnel, but will fate allow it
             if (fate.nextInt(10) > threshold) {return true;}
