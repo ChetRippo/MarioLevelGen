@@ -110,6 +110,8 @@ public class BlazeLevel extends Level implements LevelInterface {
 
         chunksToMake--;
 
+        chunkWidth = randomking.nextInt(6) + 3;
+
         if(chunksToMake == 0){
             buildFinalChunk(c, startX + chunkWidth);
         }else{

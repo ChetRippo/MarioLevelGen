@@ -80,6 +80,7 @@ public class ChunkBuilder {
         sketchChunk(chunk, width, height, type); //populates array with 0's and 1's for blocks
         setChunk(chunk, width, height, startX, startY, type); //set the actual tiles for the chunk
         setBelowChunk(chunk, width, height, startX, startY, type);// populate tiles under a chunk (I figured I'd make this separate since it chunks have different types the area under them should change)
+        setEnemiesOnChunk(chunk, width, height, startX, startY, type);
 
         //add to level tiles
         return chunk;
@@ -279,6 +280,13 @@ public class ChunkBuilder {
                     }
                 }
             }
+        }
+    }
+
+    private void setEnemiesOnChunk(int[][] chunk, int width, int height, int startX, int startY, char type){
+        if(startX > 24 && type == 'n' && Math.random() > 0.4){
+            int enemy = (int)Math.floor(Math.random()*4);
+            lvl.setSpriteTemplate(startX+4, (int)floor+4, new SpriteTemplate(enemy, false));
         }
     }
 
