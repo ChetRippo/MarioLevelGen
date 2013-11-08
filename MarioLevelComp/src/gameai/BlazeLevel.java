@@ -99,7 +99,7 @@ public class BlazeLevel extends Level implements LevelInterface {
         //int i = generator.nextInt(10) + 1;
         c.block_density = Math.random()*1;
 
-        chunkWidth = randomking.nextInt(6) + 3;
+        chunkWidth = randomking.nextInt(10) + 3;
         totalChunks++;
         if(Math.random()*totalChunks > 15){
             buildFinalChunk(c, startX + chunkWidth);
