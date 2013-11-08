@@ -52,8 +52,9 @@ public class BlazeLevel extends Level implements LevelInterface {
         public static final byte TUBE_SIDE_RIGHT = BlazeLevel.TUBE_SIDE_RIGHT;
     }
 
-    static final int chunkWidth = 8;
-    static final int floor = (int)Math.floor(Math.random()*10) + 7;
+    Random randomking = new Random();
+    int chunkWidth = randomking.nextInt(6) + 3;
+    static final int floor = (int)Math.floor(Math.random()*5) + 10;
 
     static int chunksToMake = (int)Math.floor(Math.random()*30)+10;
 
@@ -103,6 +104,8 @@ public class BlazeLevel extends Level implements LevelInterface {
 
         addChunkToSketchedLevel(chunk);
 
+        //Random generator = new Random();
+        //int i = generator.nextInt(10) + 1;
         c.block_density = Math.random()*1;
 
         chunksToMake--;

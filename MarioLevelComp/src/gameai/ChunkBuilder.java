@@ -31,6 +31,7 @@ public class ChunkBuilder {
 
     //members
     int jumpHeight = 3; //This is used to determine the max height blocks can be spaced vertically
+    int jumpLength = 4;
     Level lvl;
     double block_density;
     int platform_size;
@@ -57,8 +58,8 @@ public class ChunkBuilder {
         switch(type){
             case 'n':
                 this.block_density = Math.random();
-                if(this.block_density < 0.2){
-                    this.block_density = 0.2;
+                if(this.block_density < 0.3){
+                    this.block_density = 0.3;
                 }
                 this.platform_size = (int)Math.floor(Math.random()*12)+4;
                 this.pillars = 0.2;
@@ -76,7 +77,7 @@ public class ChunkBuilder {
 
         }
 
-        sketchChunk(chunk, width, height); //populates array with 0's and 1's for blocks
+        sketchChunk(chunk, width, height, type); //populates array with 0's and 1's for blocks
         setChunk(chunk, width, height, startX, startY, type); //set the actual tiles for the chunk
         setBelowChunk(chunk, width, height, startX, startY, type);// populate tiles under a chunk (I figured I'd make this separate since it chunks have different types the area under them should change)
 
@@ -84,11 +85,12 @@ public class ChunkBuilder {
         return chunk;
     }
 
-    public void sketchChunk(int[][] chunk, int width, int height) {
+    public void sketchChunk(int[][] chunk, int width, int height, char type) {
         //What is the middle, for placing start and end platforms
         int center_block = height / 2;
-        double block_chance = 1.0; //how likely are we to place a block
+        double block_chance = 0.0; //how likely are we to place a block
         int continuous_blocks = 0; //Did we just place a block
+        int continuous_gap = 0;
 
         chunk[0][center_block] = 1;
         chunk[width - 1][center_block] = 1;
@@ -106,12 +108,17 @@ public class ChunkBuilder {
                     block_chance = calculateBlockChance(chunk, continuous_blocks, width, height, x, y);
                     double block_picker = Math.random();
                     //Is our picker within block_chance
-                    if(block_picker < block_chance) {
+                    if(block_picker < block_chance || continuous_gap > jumpLength) {
                         chunk[x][y] = 1;
                         continuous_blocks++;
+                        continuous_gap = 0;
 
+                        /*
                         if (block_picker < pillars) {
                             chunk[x][y] = 1;
+                            columns[x] = 1;
+                        }*/
+                        if(type != 'p') {
                             columns[x] = 1;
                         }
 
@@ -119,7 +126,10 @@ public class ChunkBuilder {
                             floor = y;
                         }
                     }
-                    else {continuous_blocks = 0;}
+                    else {
+                        continuous_blocks = 0;
+                        continuous_gap++;
+                    }
                 }
             }
         }
@@ -270,9 +280,10 @@ public class ChunkBuilder {
         return false;
     }
     private boolean checkBlockRight(int[][] chunk, int x, int y, int width) {
-        if(x < width -1) {
+        if(x < width - 1) {
             if(chunk[x+1][y] != 1){return true;}
         }
+        else {return true;}
         return false;
     }
 }
