@@ -143,11 +143,9 @@ public class ChunkBuilder {
     * */
     private void digTunnels(int[][] chunk, int width, int height) {
         boolean placedEntrance = false;
-        boolean placedExit = true;
+        boolean placedExit = false;
         int[] entrance = new int[2]; //[x,y] of entrance
         int[] exit = new int[2]; //[x,y] of exit
-        int tunnel_floor = height - 1;
-
         //FIRST PASS : SEE IF THERE IS A LEGAL ENTRANCE AND EXIT
         //Traverse by column because that feels intuitive for the tunneling
         for(int x=0; x < width; x++) {
@@ -157,6 +155,7 @@ public class ChunkBuilder {
                         //if it is, place entrance[]
                         placedEntrance = true;
                         entrance[0] = x; entrance[1] = y;
+                        System.out.printf("ENTRANCE MADE AT %d,%d\n",x,y);
                     }
                     //can we place an exit here
                     //check if its a good exit
@@ -164,53 +163,58 @@ public class ChunkBuilder {
                         //if it is, place exit[]
                         placedExit = true;
                         exit[0] = x; exit[1] = y;
+                        System.out.printf("EXIT MADE AT %d,%d\n",x,y);
                         break;
                     }
             }
         }
-        tunnel_floor = ((entrance[1] < exit[1]) ? entrance[1] : exit[1]) + jumpHeight;
-        if (tunnel_floor >= height) {tunnel_floor = height - 1;}
+        int tunnel_floor = ((entrance[1] < exit[1]) ? entrance[1] : exit[1]) + jumpHeight;
+        //if (tunnel_floor >= height) {tunnel_floor = height - 1;}
 
-        printChunkInfo(chunk, width, height);
         //SECOND PASS : DIG A TUNNEL/CAVE BETWEEN THE TWO
         for(int x=0; x < width; x++) {
-            for(int y=0; y<height; y++) {
-                boolean check_x = (x == entrance[1] || x == exit[1]);
+            for(int y=0; y < height; y++) {
+                boolean check_x = (x == entrance[0] || x == exit[0]);
+                //if we are under an entrance or exit, DIG to tunnel floor
                 if(check_x && y < tunnel_floor) {
-                    chunk[x][y] = 0; //may end up being 2 for painting purposes
+                    chunk[x][y] = 2; //may end up being 2 for painting purposes
                 }
                 else {
                     //lets see if its part of the tunnel between  exit and entrance
-                    if (x > entrance[1] && x < exit[1] && y < tunnel_floor) {
+                    if (x > entrance[0] && x < exit[0] && y < tunnel_floor) {
                         //if there is a block above us, we can have a ceiling and its safe to dig
                         if(!checkBlockTop(chunk, x, y)) {
-                            chunk[x][y] = 0; //may end up being 2 later
+                            chunk[x][y] = 2; //may end up being 2 later
                         }
                     }
+
                 }
             }
         }
+        printChunkInfo(chunk, width, height);
+        System.out.printf("Entrance: %b, Exit: %b, EnLoc: %d,%d, ExLox: %d,%d, floor: %d\n\n",
+                placedEntrance, placedExit, entrance[1],entrance[1], exit[0],exit[1], tunnel_floor);
     }
 
     //is this spot a good place for a tunnel entrance
     private boolean isLegalEntrance(int x, int y, int[][] chunk, int width, int height) {
-        boolean result;
-        result = checkBlockTop(chunk, x, y) && !checkBlockRight(chunk, x, y, width) && !checkBlockLeft(chunk, x, y);
+        boolean check = chunk[x][y] == 1 && checkBlockTop(chunk, x, y) && checkBlockFloat(chunk, x, y, height) && !checkBlockRight(chunk, x, y, width) && !checkBlockLeft(chunk, x, y);
         //TODO:make it possible for first columns to be entrances, make tunnels shoot off front
-        return x == 1;//result;
+        check = check && x != 0;
+        return x==1;//check;
     }
 
     //is this spot a good place for a tunnel exit
     private boolean isLegalExit(int x, int y, int[][] chunk, int width, int height, int[] entrance) {
-        boolean check = checkBlockTop(chunk,x,y) && !checkBlockRight(chunk, x, y, width) && !checkBlockLeft(chunk, x, y);
+        boolean check = chunk[x][y] == 1 && checkBlockTop(chunk,x,y) && checkBlockFloat(chunk, x, y, height) && !checkBlockRight(chunk, x, y, width) && !checkBlockLeft(chunk, x, y);
         //TODO:make it possible for last columns to be entrances, make tunnels shoot off end
-        int threshold = 4;
+        int threshold = 2;
         Random fate = new Random();
         if((x > entrance[0] + 2) && check) {
             //we can legally add a tunnel, but will fate allow it
             if (fate.nextInt(10) > threshold) {return true;}
         }
-        return x == 4;//false;
+        return x==4;//false;
 
     }
 
@@ -220,7 +224,8 @@ public class ChunkBuilder {
             System.out.print("[");
             for(int x=0; x<width; x++) {
                 String out = "";
-                if(chunk[x][y] == 0) {out = ".";}
+                if(chunk[x][y] == 0) {out = " ";}
+                else if(chunk[x][y] == 2) {out = "∆";}
                 else {out = "X";}
                 if(x != width - 1) {out = out + "|";}
                 System.out.print(out);
