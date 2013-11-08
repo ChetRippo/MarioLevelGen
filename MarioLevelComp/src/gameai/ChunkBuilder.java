@@ -43,7 +43,7 @@ public class ChunkBuilder {
         this.platform_size =  platform_size; //what is the "average" platform size
     }
 
-    public void buildChunks(int startX, int startY, int width, int height, char type) {
+    public int[][] buildChunks(int startX, int startY, int width, int height, char type) {
         if (width <= 0) {throw new IllegalArgumentException("buildChunks Exception : Need positive width");}
         if (height <= 0) {throw new IllegalArgumentException("buildChunks Exception : Need positive height");}
 
@@ -79,6 +79,9 @@ public class ChunkBuilder {
         sketchChunk(chunk, width, height); //populates array with 0's and 1's for blocks
         setChunk(chunk, width, height, startX, startY, type); //set the actual tiles for the chunk
         setBelowChunk(chunk, width, height, startX, startY, type);// populate tiles under a chunk (I figured I'd make this separate since it chunks have different types the area under them should change)
+
+        //add to level tiles
+        return chunk;
     }
 
     public void sketchChunk(int[][] chunk, int width, int height) {
@@ -262,10 +265,7 @@ public class ChunkBuilder {
     private boolean checkBlockLeft(int[][] chunk, int x, int y) {
         if(x == 0) {return true;}
         if(x > 0) {
-            try{if(chunk[x-1][y] != 1 && !(chunk[x][y+1] != 1 && chunk[x][y-1] !=1)) {return true;}}
-            catch(ArrayIndexOutOfBoundsException z){
-                return false;
-            }
+            if(chunk[x-1][y] != 1) {return true;}
         }
         return false;
     }

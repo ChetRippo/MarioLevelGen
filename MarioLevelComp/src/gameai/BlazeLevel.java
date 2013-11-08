@@ -55,6 +55,10 @@ public class BlazeLevel extends Level implements LevelInterface {
     static final int chunkWidth = 8;
     static final int floor = (int)Math.floor(Math.random()*10) + 7;
 
+    static int chunksToMake = (int)Math.floor(Math.random()*30)+10;
+
+    public int[][] sketchedLevel = new int[8][30];
+
     public BlazeLevel(int width, int height, long seed, int difficulty,
                       int type) {
         super(width, height);
@@ -65,7 +69,7 @@ public class BlazeLevel extends Level implements LevelInterface {
 
         double block_density = 0.7; //Between 0 - 1
         int platform_avg = 1;
-        ChunkBuilder c = new ChunkBuilder(this, block_density, 1);
+        ChunkBuilder c = new ChunkBuilder(this, block_density, platform_avg);
 
         buildStartChunk(c);
 
@@ -95,13 +99,15 @@ public class BlazeLevel extends Level implements LevelInterface {
 
     private void buildChunk(ChunkBuilder c, int startX, char type) {
         int chunkFloor = (floor - 3 - (int)Math.floor(Math.random()*4));
-        c.buildChunks(startX, chunkFloor, chunkWidth, chunkWidth, type);
+        int[][] chunk = c.buildChunks(startX, chunkFloor, chunkWidth, chunkWidth, type);
+
+        addChunkToSketchedLevel(chunk);
 
         c.block_density = Math.random()*1;
 
-        int isLastChunk = (int)Math.floor(Math.random()*startX);
-        boolean last = (isLastChunk > 100);
-        if(last){
+        chunksToMake--;
+
+        if(chunksToMake == 0){
             buildFinalChunk(c, startX + chunkWidth);
         }else{
             buildChunk(c, startX+chunkWidth, getChunkType(Math.random(), type));
@@ -109,14 +115,23 @@ public class BlazeLevel extends Level implements LevelInterface {
     }
 
     private void buildStartChunk(ChunkBuilder c){
-        c.buildChunks(0, floor-3, chunkWidth, chunkWidth, 'n');
+        int[][] chunk = c.buildChunks(0, floor-3, chunkWidth, chunkWidth, 'n');
+
+        addChunkToSketchedLevel(chunk);
     }
 
     private void buildFinalChunk(ChunkBuilder c, int startX){
         xExit = startX+4;
         yExit = floor-3;
-        c.buildChunks(startX, floor-3, chunkWidth, chunkWidth, 'n');
+        int[][] chunk = c.buildChunks(startX, floor-3, chunkWidth, chunkWidth, 'n');
+
+        addChunkToSketchedLevel(chunk);
     }
 
-
+    private void addChunkToSketchedLevel(int[][] chunk){
+        int[][] newSketchedLevel = new int[sketchedLevel.length+chunk.length][30];
+        System.arraycopy(sketchedLevel, 0, newSketchedLevel, 0, sketchedLevel.length);
+        System.arraycopy(chunk, 0, newSketchedLevel, sketchedLevel.length, chunk.length);
+        sketchedLevel = newSketchedLevel;
+    }
 }
