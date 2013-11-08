@@ -81,17 +81,17 @@ public class BlazeLevel extends Level implements LevelInterface {
     private char getChunkType(double rand, char currentType){
         if(rand > 0.6){
             if(currentType == 'n'){
-                if(rand > 0.7){
+                //if(rand > 0.7){
                     return 'p';
-                }else{
-                    return 'q';
-                }
+                //}else{
+                //    return 'q';
+                //}
             }else{
-                if(rand > 0.7){
+                //if(rand > 0.7){
                     return 'n';
-                }else{
-                    return 'q';
-                }
+                //}else{
+                  //  return 'q';
+                //}
             }
         }else{
             return currentType;
