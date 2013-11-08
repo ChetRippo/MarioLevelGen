@@ -58,8 +58,8 @@ public class ChunkBuilder {
         switch(type){
             case 'n':
                 this.block_density = Math.random();
-                if(this.block_density < 0.3){
-                    this.block_density = 0.3;
+                if(this.block_density < 0.2){
+                    this.block_density = 0.2;
                 }
                 this.platform_size = (int)Math.floor(Math.random()*12)+4;
                 this.pillars = 0.2;
@@ -133,6 +133,100 @@ public class ChunkBuilder {
                 }
             }
         }
+        //NOW GET TUNNELING!
+        digTunnels(chunk, width, height);
+    }
+
+    /*
+    Make 2 passes over a set chunk and dig tunnels (if possible)
+    * */
+    private void digTunnels(int[][] chunk, int width, int height) {
+        boolean placedEntrance = false;
+        boolean placedExit = true;
+        int[] entrance = new int[2]; //[x,y] of entrance
+        int[] exit = new int[2]; //[x,y] of exit
+        int tunnel_floor = height - 1;
+
+        //FIRST PASS : SEE IF THERE IS A LEGAL ENTRANCE AND EXIT
+        //Traverse by column because that feels intuitive for the tunneling
+        for(int x=0; x < width; x++) {
+            for(int y=0; y < height; y++) {
+                    //check if its a good entrance spot
+                    if(!placedEntrance && isLegalEntrance(x,y,chunk,width,height)) {
+                        //if it is, place entrance[]
+                        placedEntrance = true;
+                        entrance[0] = x; entrance[1] = y;
+                    }
+                    //can we place an exit here
+                    //check if its a good exit
+                    else if(!placedExit && isLegalExit(x,y,chunk,width,height,entrance)) {
+                        //if it is, place exit[]
+                        placedExit = true;
+                        exit[0] = x; exit[1] = y;
+                        break;
+                    }
+            }
+        }
+        tunnel_floor = ((entrance[1] < exit[1]) ? entrance[1] : exit[1]) + jumpHeight;
+        if (tunnel_floor >= height) {tunnel_floor = height - 1;}
+
+        printChunkInfo(chunk, width, height);
+        //SECOND PASS : DIG A TUNNEL/CAVE BETWEEN THE TWO
+        for(int x=0; x < width; x++) {
+            for(int y=0; y<height; y++) {
+                boolean check_x = (x == entrance[1] || x == exit[1]);
+                if(check_x && y < tunnel_floor) {
+                    chunk[x][y] = 0; //may end up being 2 for painting purposes
+                }
+                else {
+                    //lets see if its part of the tunnel between  exit and entrance
+                    if (x > entrance[1] && x < exit[1] && y < tunnel_floor) {
+                        //if there is a block above us, we can have a ceiling and its safe to dig
+                        if(!checkBlockTop(chunk, x, y)) {
+                            chunk[x][y] = 0; //may end up being 2 later
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    //is this spot a good place for a tunnel entrance
+    private boolean isLegalEntrance(int x, int y, int[][] chunk, int width, int height) {
+        boolean result;
+        result = checkBlockTop(chunk, x, y) && !checkBlockRight(chunk, x, y, width) && !checkBlockLeft(chunk, x, y);
+        //TODO:make it possible for first columns to be entrances, make tunnels shoot off front
+        return x == 1;//result;
+    }
+
+    //is this spot a good place for a tunnel exit
+    private boolean isLegalExit(int x, int y, int[][] chunk, int width, int height, int[] entrance) {
+        boolean check = checkBlockTop(chunk,x,y) && !checkBlockRight(chunk, x, y, width) && !checkBlockLeft(chunk, x, y);
+        //TODO:make it possible for last columns to be entrances, make tunnels shoot off end
+        int threshold = 4;
+        Random fate = new Random();
+        if((x > entrance[0] + 2) && check) {
+            //we can legally add a tunnel, but will fate allow it
+            if (fate.nextInt(10) > threshold) {return true;}
+        }
+        return x == 4;//false;
+
+    }
+
+    ////PRINT OUT CHUNKS GOD DAMMIT
+    private void printChunkInfo(int[][] chunk, int width, int height) {
+        for(int y=0; y< height; y++) {
+            System.out.print("[");
+            for(int x=0; x<width; x++) {
+                String out = "";
+                if(chunk[x][y] == 0) {out = ".";}
+                else {out = "X";}
+                if(x != width - 1) {out = out + "|";}
+                System.out.print(out);
+            }
+            System.out.print("]\n");
+        }
+        System.out.print("\n");
     }
 
     private void setChunk(int[][] chunk, int width, int height, int startX, int startY, char type) {
@@ -146,6 +240,10 @@ public class ChunkBuilder {
                     * the block relative to the whole chunk, so we can decorate it
                     * as top-left, or floating, or ground etc
                     *
+                    * Each check true returns true if block is neighboring void
+                    * above, below, or to the left or right of them
+                    * making the block the topmost, floating, leftmost or rightmost block
+                    *
                     * [TOP | FLOATING | LEFT | RIGHT]
                     * */
                     boolean[] checks = new boolean[4];
@@ -157,7 +255,8 @@ public class ChunkBuilder {
                     checks[2] = checkBlockLeft(chunk, x, y);
                     //if right wall
                     checks[3] = checkBlockRight(chunk, x, y, width);
-                    checkChunkChecks(checks, x, startX, y, startY, type);
+                    //lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.ROCK); //test to see if checkChunkChecks is messing up
+                    checkChunkChecks(checks, x, startX, y, startY, type); //uncomment to try and block for every 1
                 }
             }
         }
@@ -186,14 +285,14 @@ public class ChunkBuilder {
     private double calculateBlockChance(int[][] chunk, int continuous_blocks, int width, int height, int x, int y) {
         double block_chance = 0.0;
         if (continuous_blocks < platform_size) {
-            block_chance = block_density + (continuous_blocks * 0.2);
+            block_chance = block_density + (continuous_blocks * 0.1);
         }
         else {
-            block_chance = block_density - (continuous_blocks * 0.2);
+            block_chance = block_density - (continuous_blocks * 0.1);
         }
         //Is there a ledge (block->gap or gap->ledge) above us?
         boolean beneath_ledge = checkUnderLedge(chunk, width, height, x, y);
-        if (beneath_ledge) {block_chance += 0.3;}
+        if (beneath_ledge) {block_chance += 0.2;}
         return block_chance;
     }
 
@@ -279,6 +378,7 @@ public class ChunkBuilder {
         }
         return false;
     }
+
     private boolean checkBlockRight(int[][] chunk, int x, int y, int width) {
         if(x < width - 1) {
             if(chunk[x+1][y] != 1){return true;}
