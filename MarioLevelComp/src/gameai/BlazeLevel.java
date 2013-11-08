@@ -53,7 +53,7 @@ public class BlazeLevel extends Level implements LevelInterface {
     }
 
     Random randomking = new Random();
-    int chunkWidth = randomking.nextInt(6) + 3;
+    int chunkWidth = randomking.nextInt(18) + 10;
     static final int floor = (int)Math.floor(Math.random()*5) + 10;
 
     static int chunksToMake = (int)Math.floor(Math.random()*30)+10;
