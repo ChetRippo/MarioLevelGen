@@ -53,11 +53,14 @@ public class BlazeLevel extends Level implements LevelInterface {
     }
 
     Random fate = new Random();
-    int chunkWidth = fate.nextInt(18) + 10;
-    static final int floor = (int)Math.floor(Math.random()*5) + 10;
+    int chunkWidth = fate.nextInt(18) + 10; //chunks of width 10 -> 28
+    int chunkHeight = fate.nextInt(8) + 3; //chunks of height 3 -> 11
+    static final int WORLD_HEIGHT = 14;
+    static final int JUMP_HEIGHT = 4;
+    //static final int floor = (int)Math.floor(Math.random()*5) + 10;
 
     private static int totalChunks = 0;
-    public int[][] sketchedLevel = new int[8][30];
+    //public int[][] sketchedLevel = new int[8][30];
 
     public BlazeLevel(int width, int height, long seed, int difficulty,
                       int type) {
@@ -90,17 +93,22 @@ public class BlazeLevel extends Level implements LevelInterface {
     }
 
     private void buildChunk(ChunkBuilder c, int startX, char type) {
-        int chunkFloor = (floor - 3 - (int)Math.floor(Math.random()*4));
-        int[][] chunk = c.buildChunks(startX, chunkFloor, chunkWidth, (22-floor), type);
+        //int chunkFloor = (floor - 3 - (int)Math.floor(Math.random()*4));
+        int startY = WORLD_HEIGHT - chunkHeight;
+        int[][] chunk = c.buildChunks(startX, startY, chunkWidth, chunkHeight, type);
 
-        addChunkToSketchedLevel(chunk);
+        //addChunkToSketchedLevel(chunk);
 
         //Random generator = new Random();
         //int i = generator.nextInt(10) + 1;
         c.block_density = Math.random()*1;
 
         int curr_width = chunkWidth;
-        chunkWidth = fate.nextInt(10) + 3;
+        int curr_height = chunkHeight;
+        chunkWidth = fate.nextInt(18) + 10; //chunks of width 10 -> 28
+        chunkHeight = fate.nextInt(curr_height + JUMP_HEIGHT) + (curr_height - JUMP_HEIGHT);//make next chunk height in jumpable range
+        if (chunkHeight < 3) {chunkHeight = 3;}
+        else if (chunkHeight > 11) {chunkHeight = 11;}
         totalChunks++;
         if(Math.random()*totalChunks > 15){
             buildFinalChunk(c, startX + curr_width);
@@ -110,25 +118,23 @@ public class BlazeLevel extends Level implements LevelInterface {
     }
 
     private void buildStartChunk(ChunkBuilder c){
-        int[][] chunk = c.buildChunks(0, floor-3, chunkWidth, (22-floor), 'n');
+        int[][] chunk = c.buildChunks(0, WORLD_HEIGHT-chunkHeight, chunkWidth, chunkHeight, 'n');
 
-        addChunkToSketchedLevel(chunk);
-
-      //  setBlock(1, floor-5, Tiles.BLOCK_POWERUP);
+        //addChunkToSketchedLevel(chunk);
     }
 
     private void buildFinalChunk(ChunkBuilder c, int startX){
         xExit = startX;
-        yExit = floor-3;
-        int[][] chunk = c.buildChunks(startX+2, floor-3, chunkWidth, (22-floor), 'n');
+        yExit = WORLD_HEIGHT-chunkHeight;
+        int[][] chunk = c.buildChunks(startX+2, WORLD_HEIGHT-chunkHeight, chunkWidth, chunkHeight, 'n');
 
-        addChunkToSketchedLevel(chunk);
+        //addChunkToSketchedLevel(chunk);
     }
-
+    /*
     private void addChunkToSketchedLevel(int[][] chunk){
         int[][] newSketchedLevel = new int[sketchedLevel.length+chunk.length][30];
         System.arraycopy(sketchedLevel, 0, newSketchedLevel, 0, sketchedLevel.length);
         System.arraycopy(chunk, 0, newSketchedLevel, sketchedLevel.length, chunk.length);
         sketchedLevel = newSketchedLevel;
-    }
+    } */
 }

@@ -50,6 +50,9 @@ public class ChunkBuilder {
         if (height <= 0) {throw new IllegalArgumentException("buildChunks Exception : Need positive height");}
 
         //Build a 2D array of width by height
+        //startY = 14;
+        //width = 3;
+        //height = 3;
         int[][] chunk = new int[width][height];
 
         //n - normal, flatish terrain
@@ -136,13 +139,13 @@ public class ChunkBuilder {
             }
         }
         //Given the solid block, dig out tunnels
-        int tunnel_pass = fate.nextInt(3);
+        int tunnel_pass = fate.nextInt(2) + 2;
         while(tunnel_pass > 0) {
             digTunnels(chunk, width, height);
             tunnel_pass--;
         }
         //Now make sure all vertical jumps are feasable
-        jumpCritic(chunk, width, height);
+        heightCritic(chunk, width, height);
 
         printChunkInfo(chunk, width, height);
     }
@@ -216,7 +219,7 @@ public class ChunkBuilder {
 
      If it is not, place a block (set to 1)
      */
-    private void jumpCritic(int[][] chunk, int width, int height) {
+    private void heightCritic(int[][] chunk, int width, int height) {
         for(int x=0; x < width - 1; x++) { //check all but second-to-last column
             int next_height = -1;
             int height_count = 0;
@@ -234,6 +237,8 @@ public class ChunkBuilder {
                 //if it has been jumpHeight since last platform, force block
                 if(height_count >= jumpHeight-1) {
                     //System.out.println("HEIGHT CRITIC SAID ENOUGH IS ENOUGH");
+                    next_height = -1;
+                    height_count = 0;
                     chunk[x][y] = 1;
                 }
             }
