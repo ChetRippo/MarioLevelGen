@@ -353,8 +353,20 @@ public class ChunkBuilder {
 
     private void setEnemiesOnChunk(int[][] chunk, int width, int height, int startX, int startY, char type){
         if(startX > 24 && type == 'n' && Math.random() > 0.4){
-            int enemy = (int)Math.floor(Math.random()*4);
-            lvl.setSpriteTemplate(startX+4, (int)floor+8, new SpriteTemplate(enemy, false));
+            int enemy = 6;//(int)Math.floor(Math.random()*4);
+            lvl.setSpriteTemplate(startX+4, startY, new SpriteTemplate(enemy, true));
+        }
+        if(startX > 24 && type == 'p' && Math.random() > 0.3){
+            for(int destX = startX;destX < width+startX; destX++){
+                for(int destY = 0;destY < 22; destY++){
+                    if(lvl.getBlock(destX, destY) == 0 && lvl.getBlock(destX, destY+1) == 0 &&lvl.getBlock(destX, destY+2) == 0 && lvl.getBlock(destX, destY+3) != 0 && lvl.getBlock(destX+1, destY) == 0&& lvl.getBlock(destX-1, destY) == 0){
+                        lvl.setBlock(destX, destY, (byte) (14 + 0 * 16));
+                        lvl.setBlock(destX, destY+1, (byte) (14 + 1 * 16));
+                        lvl.setBlock(destX, destY+2, (byte) (14 + 2 * 16));
+                        return;
+                    }
+                }
+            }
         }
     }
 
@@ -411,7 +423,7 @@ public class ChunkBuilder {
             else {
                 //if floating
                 if (checks[1]) {
-                    lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.GROUND); //coin for fun
+                    lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.GROUND);
                 }
                 //middle single column
                 else if (checks[2] && checks[3]) {
