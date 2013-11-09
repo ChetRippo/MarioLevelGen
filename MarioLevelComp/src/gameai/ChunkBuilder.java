@@ -346,7 +346,16 @@ public class ChunkBuilder {
                     }
                     if(set && lvl.getBlock(x, y) == 0){
                         if(type == 'n'){
-                            lvl.setBlock(x, y, BlazeLevel.Tiles.GROUND);
+                            if(lvl.getBlock(x-1, y) == 0){
+                                lvl.setBlock(x, y, BlazeLevel.Tiles.LEFT_GRASS_EDGE);
+                            }else if(lvl.getBlock(x+1, y) == 0){
+                                lvl.setBlock(x, y, BlazeLevel.Tiles.RIGHT_GRASS_EDGE);
+                                if(lvl.getBlock(x-1, y) == BlazeLevel.Tiles.RIGHT_GRASS_EDGE){
+                                    lvl.setBlock(x-1, y, BlazeLevel.Tiles.GROUND);
+                                }
+                            }else{
+                                lvl.setBlock(x, y, BlazeLevel.Tiles.GROUND);
+                            }
                         }else if(type == 'p'){
                             lvl.setBlock(x, y, BlazeLevel.Tiles.ROCK);
                         }
@@ -372,7 +381,7 @@ public class ChunkBuilder {
         }if(startX > 24 && type == 'p' && Math.random() > 0.3){
             for(int destX = startX+(int)Math.floor(Math.random()*3);destX < width+startX; destX++){
                 for(int destY = 6;destY < 22; destY++){
-                    if(lvl.getBlock(destX, destY) == 0 && lvl.getBlock(destX, destY+1) == 0 &&lvl.getBlock(destX, destY+2) == 0 && lvl.getBlock(destX, destY+3) != 0 && lvl.getBlock(destX+1, destY) == 0&& lvl.getBlock(destX-1, destY) == 0){
+                    if(lvl.getBlock(destX, destY) == 0 && lvl.getBlock(destX, destY+1) == 0 &&lvl.getBlock(destX, destY+2) == 0 && lvl.getBlock(destX, destY+3) != 0 && lvl.getBlock(destX, destY+3) != BlazeLevel.Tiles.COIN && lvl.getBlock(destX+1, destY) == 0&& lvl.getBlock(destX-1, destY) == 0){
                         lvl.setBlock(destX, destY, (byte) (14 + 0 * 16));
                         lvl.setBlock(destX, destY+1, (byte) (14 + 1 * 16));
                         lvl.setBlock(destX, destY+2, (byte) (14 + 2 * 16));
