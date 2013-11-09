@@ -154,6 +154,8 @@ public class ChunkBuilder {
     Make 2 passes over a set chunk and dig tunnels (if possible)
     * */
     private void digTunnels(int[][] chunk, int width, int height) {
+        int entrance_factor = 0; //influence how likely an entrance will be
+        int exit_factor = 0; //influence how likely an exit will be
         boolean placedEntrance = false;
         boolean placedExit = false;
         int[] entrance = new int[2]; //[x,y] of entrance
@@ -163,20 +165,23 @@ public class ChunkBuilder {
         for(int x=0; x < width; x++) {
             for(int y=0; y < height; y++) {
                     //check if its a good entrance spot
-                    if(!placedEntrance && isLegalEntrance(x,y,chunk,width,height)) {
+                    if(!placedEntrance && isLegalEntrance(x,y,chunk,width,height, entrance_factor)) {
                         //if it is, place entrance[]
                         placedEntrance = true;
                         entrance[0] = x; entrance[1] = y;
                         System.out.printf("ENTRANCE MADE AT %d,%d\n",x,y);
                     }
+                    else {entrance_factor++;}
                     //can we place an exit here
                     //check if its a good exit
-                    else if(!placedExit && isLegalExit(x,y,chunk,width,height,entrance)) {
+                    if(placedEntrance && !placedExit && isLegalExit(x,y,chunk,width,height,entrance, exit_factor)) {
                         //if it is, place exit[]
                         placedExit = true;
                         exit[0] = x; exit[1] = y;
                         System.out.printf("EXIT MADE AT %d,%d\n",x,y);
                     }
+                    else {exit_factor++;}
+
             }
         }
         int tunnel_floor;
@@ -246,23 +251,23 @@ public class ChunkBuilder {
     }
 
     //is this spot a good place for a tunnel entrance
-    private boolean isLegalEntrance(int x, int y, int[][] chunk, int width, int height) {
+    private boolean isLegalEntrance(int x, int y, int[][] chunk, int width, int height, int entrance_factor) {
         boolean check = isTopGround(chunk,x,y) && !checkBlockFloat(chunk, x, y, height) && !checkBlockRight(chunk, x, y, width) && !checkBlockLeft(chunk, x, y);
         //boolean ground_top, ground_left, ground_right,
         //TODO:make it possible for first columns to be entrances, make tunnels shoot off front
-        int threshold = 4;
-        if (fate.nextInt(10) > threshold) {return check;}
+        int threshold = 9;
+        if (fate.nextInt(10) + entrance_factor > threshold) {return check;}
         return false;
     }
 
     //is this spot a good place for a tunnel exit
-    private boolean isLegalExit(int x, int y, int[][] chunk, int width, int height, int[] entrance) {
+    private boolean isLegalExit(int x, int y, int[][] chunk, int width, int height, int[] entrance, int exit_factor) {
         boolean check = isTopGround(chunk, x, y) && !checkBlockFloat(chunk, x, y, height) && !checkBlockRight(chunk, x, y, width) && !checkBlockLeft(chunk, x, y);
         //TODO:make it possible for last columns to be entrances, make tunnels shoot off end
-        int threshold = 4;
-        if((x > entrance[0] + 2) && check) {
+        int threshold = 9;
+        if((x > entrance[0] + 4) && check) {
             //we can legally add a tunnel, but will fate allow it
-            if (fate.nextInt(10) > threshold) {return true;}
+            if (fate.nextInt(10) + exit_factor > threshold) {return true;}
         }
         return false;
 
