@@ -364,13 +364,12 @@ public class ChunkBuilder {
             for(int destX = startX;destX < width+startX; destX++){
                 for(int destY = 6;destY < 22; destY++){
                     if(lvl.getBlock(destX, destY) == BlazeLevel.Tiles.COIN && lvl.getBlock(destX, destY+1) != BlazeLevel.Tiles.COIN){
-                        lvl.setSpriteTemplate(destX, destY, new SpriteTemplate((int)Math.floor(Math.random()*4), false));
+                        lvl.setSpriteTemplate(destX, destY, new SpriteTemplate(Enemy.ENEMY_GOOMBA, false));
                         return;
                     }
                 }
             }
-        }
-        if(startX > 24 && type == 'p' && Math.random() > 0.3){
+        }if(startX > 24 && type == 'p' && Math.random() > 0.3){
             for(int destX = startX+(int)Math.floor(Math.random()*3);destX < width+startX; destX++){
                 for(int destY = 6;destY < 22; destY++){
                     if(lvl.getBlock(destX, destY) == 0 && lvl.getBlock(destX, destY+1) == 0 &&lvl.getBlock(destX, destY+2) == 0 && lvl.getBlock(destX, destY+3) != 0 && lvl.getBlock(destX+1, destY) == 0&& lvl.getBlock(destX-1, destY) == 0){
@@ -409,6 +408,9 @@ public class ChunkBuilder {
 
             if(type == 'p'){
                 lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.ROCK);
+                if(checks[0] && Math.random() > 0.4){
+                    lvl.setBlock(x+startX, y+startY-1, BlazeLevel.Tiles.COIN);
+                }
             }else if(type == 'q'){
                 lvl.setBlock(x+startX, y+startY, BlazeLevel.Tiles.BLOCK_POWERUP);
             }
