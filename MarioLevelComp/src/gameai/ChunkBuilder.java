@@ -354,11 +354,20 @@ public class ChunkBuilder {
     private void setEnemiesOnChunk(int[][] chunk, int width, int height, int startX, int startY, char type){
         if(startX > 24 && type == 'n' && Math.random() > 0.4){
             int enemy = 6;//(int)Math.floor(Math.random()*4);
-            lvl.setSpriteTemplate(startX+4, startY, new SpriteTemplate(enemy, true));
+            lvl.setSpriteTemplate(startX+(int)Math.floor(Math.random()*3), startY, new SpriteTemplate(enemy, true));
+        }else if(startX > 24 && type == 'n'){
+            for(int destX = startX;destX < width+startX; destX++){
+                for(int destY = 6;destY < 22; destY++){
+                    if(lvl.getBlock(destX, destY) == BlazeLevel.Tiles.COIN && lvl.getBlock(destX, destY+1) != BlazeLevel.Tiles.COIN){
+                        lvl.setSpriteTemplate(destX, destY, new SpriteTemplate((int)Math.floor(Math.random()*4), false));
+                        return;
+                    }
+                }
+            }
         }
         if(startX > 24 && type == 'p' && Math.random() > 0.3){
-            for(int destX = startX;destX < width+startX; destX++){
-                for(int destY = 0;destY < 22; destY++){
+            for(int destX = startX+(int)Math.floor(Math.random()*3);destX < width+startX; destX++){
+                for(int destY = 6;destY < 22; destY++){
                     if(lvl.getBlock(destX, destY) == 0 && lvl.getBlock(destX, destY+1) == 0 &&lvl.getBlock(destX, destY+2) == 0 && lvl.getBlock(destX, destY+3) != 0 && lvl.getBlock(destX+1, destY) == 0&& lvl.getBlock(destX-1, destY) == 0){
                         lvl.setBlock(destX, destY, (byte) (14 + 0 * 16));
                         lvl.setBlock(destX, destY+1, (byte) (14 + 1 * 16));

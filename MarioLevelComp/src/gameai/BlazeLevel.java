@@ -113,6 +113,8 @@ public class BlazeLevel extends Level implements LevelInterface {
         int[][] chunk = c.buildChunks(0, floor-3, chunkWidth, (22-floor), 'n');
 
         addChunkToSketchedLevel(chunk);
+
+      //  setBlock(1, floor-5, Tiles.BLOCK_POWERUP);
     }
 
     private void buildFinalChunk(ChunkBuilder c, int startX){
