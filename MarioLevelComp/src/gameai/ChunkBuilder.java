@@ -142,7 +142,9 @@ public class ChunkBuilder {
             tunnel_pass--;
         }
         //Now make sure all vertical jumps are feasable
-        heightCritic(chunk, width, height);
+        jumpCritic(chunk, width, height);
+
+        printChunkInfo(chunk, width, height);
     }
 
     /*
@@ -174,8 +176,12 @@ public class ChunkBuilder {
                     }
             }
         }
-        int tunnel_floor = ((entrance[1] > exit[1]) ? entrance[1] : exit[1]) + jumpHeight;
-        //if (tunnel_floor >= height) {tunnel_floor = height - 1;}
+        int tunnel_floor;
+        if (entrance[1] < exit[1]) {//entrance is higher
+            tunnel_floor = exit[1] + jumpHeight;
+        }
+        else {tunnel_floor = entrance[1] + jumpHeight;}
+        if (tunnel_floor >= height) {tunnel_floor = height - 2;}
 
         //SECOND PASS : DIG A TUNNEL/CAVE BETWEEN THE TWO
         if (placedEntrance && placedExit) {
@@ -189,9 +195,9 @@ public class ChunkBuilder {
                     }
                     else {
                         //lets see if its part of the tunnel between  exit and entrance
-                        if (x > entrance[0] && x < exit[0] && y < tunnel_floor) {
+                        if ((x > entrance[0]) && (x < exit[0]) && (y < (tunnel_floor - 1))) {
                             //if there is a block above us, we can have a ceiling and its safe to dig
-                            if((y > 0 ) && !isTopGround(chunk, x, y-1)) {
+                            if((y > 0) && !isTopGround(chunk, x, y-1)) {
                                 chunk[x][y] = 2; //may end up being 2 later
                             }
                         }
@@ -200,7 +206,6 @@ public class ChunkBuilder {
                 }
             }
         }
-        printChunkInfo(chunk, width, height);
         System.out.printf("Entrance: %b, Exit: %b, EnLoc: %d,%d, ExLox: %d,%d, floor: %d\n\n",
                 placedEntrance, placedExit, entrance[1],entrance[1], exit[0],exit[1], tunnel_floor);
     }
@@ -211,7 +216,7 @@ public class ChunkBuilder {
 
      If it is not, place a block (set to 1)
      */
-    private void heightCritic(int[][] chunk, int width, int height) {
+    private void jumpCritic(int[][] chunk, int width, int height) {
         for(int x=0; x < width - 1; x++) { //check all but second-to-last column
             int next_height = -1;
             int height_count = 0;
