@@ -457,6 +457,7 @@ public class ChunkBuilder {
                         lvl.setBlock(destX, destY, (byte) (14 + 0 * 16));
                         lvl.setBlock(destX, destY+1, (byte) (14 + 1 * 16));
                         lvl.setBlock(destX, destY+2, (byte) (14 + 2 * 16));
+                        lvl.setBlock(destX-1, destY+2-fate.nextInt(1), BlazeLevel.Tiles.ROCK);
                         return;
                     }
                 }
