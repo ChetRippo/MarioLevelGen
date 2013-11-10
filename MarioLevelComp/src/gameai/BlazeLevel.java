@@ -57,29 +57,31 @@ public class BlazeLevel extends Level implements LevelInterface {
     int chunkHeight = fate.nextInt(8) + 3; //chunks of height 3 -> 11
     static final int WORLD_HEIGHT = 14;
     static final int JUMP_HEIGHT = 4;
-    //static final int floor = (int)Math.floor(Math.random()*5) + 10;
 
     private static int totalChunks = 0;
-    //public int[][] sketchedLevel = new int[8][30];
 
     public BlazeLevel(int width, int height, long seed, int difficulty,
                       int type) {
         super(width, height);
-        create(seed, difficulty, type);
+        create();
     }
 
-    private void create(long seed, int difficulty, int type) {
+    /*
+        Create the level
+     */
+    private void create() {
 
-        double block_density = 0.4; //Between 0 - 1
-        int platform_avg = 4;
+        double block_density = 0.5; //Between 0 - 1
+        int platform_avg = 4; //approximate average of continuous blocks in a row
         ChunkBuilder c = new ChunkBuilder(this, block_density, platform_avg);
 
-        buildStartChunk(c);
-
-        buildChunk(c, chunkWidth, 'p');
-
+        buildStartChunk(c); //build the first chunk in the level
+        buildChunk(c, chunkWidth, 'p'); //build the next chunk of type 'p'
     }
 
+    /*
+        Get the next type based on what the current type is and randomness
+     */
     private char getChunkType(double rand, char currentType){
         if(rand > 0.6){
             if(currentType == 'n'){
@@ -92,15 +94,13 @@ public class BlazeLevel extends Level implements LevelInterface {
         }
     }
 
+    /*
+        Build a single chunk in the world
+     */
     private void buildChunk(ChunkBuilder c, int startX, char type) {
-        //int chunkFloor = (floor - 3 - (int)Math.floor(Math.random()*4));
         int startY = WORLD_HEIGHT - chunkHeight;
-        int chunk = c.buildChunks(startX, startY, chunkWidth, chunkHeight, type);
-
-        //addChunkToSketchedLevel(chunk);
-
-        //Random generator = new Random();
-        //int i = generator.nextInt(10) + 1;
+        c.buildChunks(startX, startY, chunkWidth, chunkHeight, type);
+        System.out.printf("BLOCK DENS IS %f\n", c.block_density);
         c.block_density = Math.random()*1;
 
         int curr_width = chunkWidth;
