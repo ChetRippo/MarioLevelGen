@@ -11,7 +11,7 @@ import java.util.Random;
 
 /**
  * Created with IntelliJ IDEA.
- * User: weed
+ * User: Brett
  * Date: 10/30/13
  * Time: 5:12 PM
  * To change this template use File | Settings | File Templates.
@@ -94,6 +94,9 @@ public class BlazeLevel extends Level implements LevelInterface {
 
     private void buildChunk(ChunkBuilder c, int startX, char type) {
         //int chunkFloor = (floor - 3 - (int)Math.floor(Math.random()*4));
+        //find highest point before this chunk
+       // findLastChunkColumn(startX);
+
         int startY = WORLD_HEIGHT - chunkHeight;
         int[][] chunk = c.buildChunks(startX, startY, chunkWidth, chunkHeight, type);
 
@@ -106,11 +109,12 @@ public class BlazeLevel extends Level implements LevelInterface {
         int curr_width = chunkWidth;
         int curr_height = chunkHeight;
         chunkWidth = fate.nextInt(18) + 10; //chunks of width 10 -> 28
-        chunkHeight = fate.nextInt(curr_height + JUMP_HEIGHT) + (curr_height - JUMP_HEIGHT);//make next chunk height in jumpable range
+        chunkHeight = fate.nextInt(4) + (4);//make next chunk height in jumpable range
+        //findLastChunkColumn(startX);
         if (chunkHeight < 3) {chunkHeight = 3;}
         else if (chunkHeight > 11) {chunkHeight = 11;}
         totalChunks++;
-        if(Math.random()*totalChunks > 15){
+        if(Math.random()*totalChunks > 6 || totalChunks > 10){
             buildFinalChunk(c, startX + curr_width);
         }else{
             buildChunk(c, startX+curr_width+2, getChunkType(Math.random(), type));
@@ -124,8 +128,8 @@ public class BlazeLevel extends Level implements LevelInterface {
     }
 
     private void buildFinalChunk(ChunkBuilder c, int startX){
-        xExit = startX;
-        yExit = WORLD_HEIGHT-chunkHeight;
+        xExit = startX+3;
+        yExit = WORLD_HEIGHT-chunkHeight+1;
         int[][] chunk = c.buildChunks(startX+2, WORLD_HEIGHT-chunkHeight, chunkWidth, chunkHeight, 'n');
 
         //addChunkToSketchedLevel(chunk);
@@ -137,4 +141,20 @@ public class BlazeLevel extends Level implements LevelInterface {
         System.arraycopy(chunk, 0, newSketchedLevel, sketchedLevel.length, chunk.length);
         sketchedLevel = newSketchedLevel;
     } */
+
+    private void findLastChunkColumn(int startX){
+        for(int x = startX-1; x > 4 && x > startX-10; x--){
+            for(int y = 0;y < WORLD_HEIGHT; y++){
+                if(getBlock(x, y) != 0){
+                    chunkHeight = (y - (int)Math.floor(Math.random()*3) + (int)Math.floor(Math.random()*3));
+                    if(chunkHeight < 3){
+                        chunkHeight = 3;
+                    }else if(chunkHeight > 14){
+                        chunkHeight = 14;
+                    }
+                    return;
+                }
+            }
+        }
+    }
 }
