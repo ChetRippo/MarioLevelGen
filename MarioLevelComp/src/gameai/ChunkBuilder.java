@@ -36,8 +36,7 @@ public class ChunkBuilder {
     Level lvl;
     double block_density;
     int platform_size;
-    double pillars = 0.2;
-    double floor = 0.1;
+   //double floor = 0.1;
 
     public ChunkBuilder(Level lvl, double block_density, int platform_size) {
         this.lvl = lvl;
@@ -45,7 +44,7 @@ public class ChunkBuilder {
         this.platform_size =  platform_size; //what is the "average" platform size
     }
 
-    public int[][] buildChunks(int startX, int startY, int width, int height, char type) {
+    public int buildChunks(int startX, int startY, int width, int height, char type) {
         if (width <= 0) {throw new IllegalArgumentException("buildChunks Exception : Need positive width");}
         if (height <= 0) {throw new IllegalArgumentException("buildChunks Exception : Need positive height");}
 
@@ -61,36 +60,28 @@ public class ChunkBuilder {
 
         switch(type){
             case 'n':
-                this.block_density = Math.random();
+                //this.block_density = //Math.random()*0.5 + (block_density * 0.3);
                 if(this.block_density < 0.2){
                     this.block_density = 0.2;
                 }
-                this.platform_size = (int)Math.floor(Math.random()*12)+4;
-                this.pillars = 0.2;
+                this.platform_size = (int)Math.floor(Math.random()*10)+platform_size;
                 break;
             case 'p':
-                this.block_density = Math.random()*0.25;
-                this.platform_size = 2;
-                this.pillars = 0.01;
+                this.block_density = block_density * 0.25;//Math.random()*0.25 + (block_density * 0.1);
+                this.platform_size = platform_size / 2;
                 break;
-            case 'q':
-                this.block_density = Math.random();
-                this.platform_size = 4;
-                this.pillars = 0.7;
-                break;
-
         }
 
-        sketchChunk(chunk, width, height, type); //populates array with 0's and 1's for blocks
+        int exit = sketchChunk(chunk, width, height, type); //populates array with 0's and 1's for blocks
         setChunk(chunk, width, height, startX, startY, type); //set the actual tiles for the chunk
         setBelowChunk(chunk, width, height, startX, startY, type);// populate tiles under a chunk (I figured I'd make this separate since it chunks have different types the area under them should change)
         setEnemiesOnChunk(chunk, width, height, startX, startY, type);
 
         //add to level tiles
-        return chunk;
+        return exit;
     }
 
-    public void sketchChunk(int[][] chunk, int width, int height, char type) {
+    public int sketchChunk(int[][] chunk, int width, int height, char type) {
         //What is the middle, for placing start and end platforms
         int center_block = height / 2;
         double block_chance = 0.0; //how likely are we to place a block
@@ -118,17 +109,8 @@ public class ChunkBuilder {
                         continuous_blocks++;
                         continuous_gap = 0;
 
-                        /*
-                        if (block_picker < pillars) {
-                            chunk[x][y] = 1;
-                            columns[x] = 1;
-                        }*/
                         if(type != 'p') {
                             columns[x] = 1;
-                        }
-
-                        if (block_picker < floor) {
-                            floor = y;
                         }
                     }
                     else {
@@ -149,7 +131,18 @@ public class ChunkBuilder {
         //Finally, remove any gaps that can't be reached
         holeCritic(chunk, width, height);
 
-        printChunkInfo(chunk, width, height);
+        //printChunkInfo(chunk, width, height);
+
+        //return the highest point at the exit
+        int highest = height/2;
+        for(int x=width-4; x < width; x++) {
+            for(int y=0; y <height; y++) {
+                if (chunk[x][y] == 1 && y < highest) {
+                    highest = y;
+                }
+            }
+        }
+        return highest;
     }
 
     /*
@@ -173,7 +166,7 @@ public class ChunkBuilder {
                         //if it is, place entrance[]
                         placedEntrance = true;
                         entrances[tunnel_index][0] = x; entrances[tunnel_index][1] = y;
-                        System.out.printf("ENTRANCE MADE AT %d,%d\n",x,y);
+                        //System.out.printf("ENTRANCE MADE AT %d,%d\n",x,y);
                     }
                     else {entrance_factor++;}
                     //can we place an exit here
@@ -182,7 +175,7 @@ public class ChunkBuilder {
                         //if it is, place exit[]
                         placedExit = true;
                         exits[tunnel_index][0] = x; exits[tunnel_index][1] = y;
-                        System.out.printf("EXIT MADE AT %d,%d\n",x,y);
+                        //System.out.printf("EXIT MADE AT %d,%d\n",x,y);
                     }
                     else {exit_factor++;}
             }
@@ -284,7 +277,7 @@ public class ChunkBuilder {
      and remove them
      */
     private void holeCritic(int[][] chunk, int width, int height) {
-        printChunkInfo(chunk,width,height);
+        //printChunkInfo(chunk,width,height);
         for(int x=1; x < width - 1; x++) {
             boolean column_cap = false; //does column x have a gap surrounded above and on the sides by blocks
             for(int y=0; y < height; y++) {
@@ -296,23 +289,6 @@ public class ChunkBuilder {
                         break;
                     }
                 }
-                //if (middle_check) {break;} //there is a way out
-                /*
-                if(column_cap) {
-                    //check that there might be a way out
-                    boolean out = chunk[x][y] != 1 && (checkBlockLeft(chunk, x, y) || checkBlockRight(chunk, x, y, width));
-                    boolean bottom = chunk[x][y] != 1 && !checkBlockFloat(chunk,x,y, height) && !checkBlockLeft(chunk,x,y) && !checkBlockRight(chunk, x, y, width);
-                    if (out) {break;}
-                    if(bottom) {chunk[x][y] = 1;}
-                }
-                else {
-                    //check for column cap
-                    boolean check = chunk[x][y] != 1 && !checkBlockTop(chunk,x,y) && !checkBlockLeft(chunk,x,y) && !checkBlockRight(chunk, x, y, width);
-                    if (check) {
-                        column_cap = true;
-                        chunk[x][y] = 1;
-                    }
-                }*/
             }
         }
     }
