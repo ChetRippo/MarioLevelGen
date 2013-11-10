@@ -367,7 +367,7 @@ public class ChunkBuilder {
 
     private void setEnemiesOnChunk(int[][] chunk, int width, int height, int startX, int startY, char type){
         if(startX > 24 && type == 'n' && Math.random() > 0.4){
-            int enemy = 6;//(int)Math.floor(Math.random()*4);
+            int enemy = 6;
             lvl.setSpriteTemplate(startX+(int)Math.floor(Math.random()*3), startY, new SpriteTemplate(enemy, true));
         }else if(startX > 24 && type == 'n'){
             for(int destX = startX;destX < width+startX; destX++){
